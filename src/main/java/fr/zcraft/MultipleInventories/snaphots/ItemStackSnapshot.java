@@ -35,33 +35,83 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
+import com.google.gson.reflect.TypeToken;
 import fr.zcraft.zlib.components.nbt.NBT;
 import fr.zcraft.zlib.components.nbt.NBTCompound;
 import fr.zcraft.zlib.tools.PluginLogger;
+import fr.zcraft.zlib.tools.items.ItemStackBuilder;
 import fr.zcraft.zlib.tools.reflection.NMSException;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.HashMap;
+import java.util.Map;
 
+
+/**
+ * A snapshot of an ItemStack when it was taken. The snapshot is frozen in time,
+ * and cannot be modified.
+ */
 public class ItemStackSnapshot
 {
     private static final Gson GSON = new Gson();
 
     private final Material id;
-    private final float durability;
+    private final short durability;
     private final int amount;
-    private final NBTCompound nbt;
+    private final Map<String, Object> nbt;
 
 
-    public ItemStackSnapshot(Material data, int amount, float durability, NBTCompound nbt)
+    /**
+     * Creates a snapshot of an {@link ItemStack}.
+     *
+     * You should use {@link #snap(ItemStack)} instead.
+     *
+     * @param id         The item's material
+     * @param durability The item's durability.
+     * @param amount     The amount of items in the stack.
+     * @param nbt        The NBT tags in the stack. May be {@code null}.
+     *
+     * @see #snap(ItemStack) Easier method to create a snapshot that you should
+     * use.
+     */
+    public ItemStackSnapshot(final Material id, final short durability, final int amount, final NBTCompound nbt)
     {
-        this.id = data;
+        this(id, durability, amount, nbt != null ? nbt.toHashMap() : null);
+    }
+
+    /**
+     * Creates a snapshot of an {@link ItemStack}.
+     *
+     * You should use {@link #snap(ItemStack)} instead.
+     *
+     * @param id         The item's material
+     * @param durability The item's durability.
+     * @param amount     The amount of items in the stack.
+     * @param nbt        The NBT tags in the stack. May be {@code null}.
+     *
+     * @see #snap(ItemStack) Easier method to create a snapshot that you should
+     * use.
+     */
+    public ItemStackSnapshot(final Material id, final short durability, final int amount, final Map<String, Object> nbt)
+    {
+        this.id = id;
         this.durability = durability;
         this.amount = amount;
         this.nbt = nbt;
+
+        PluginLogger.info("Constructed Item snapshot: {0}:{1}×{2}; NBT={3}", this.id, this.durability, this.amount, this.nbt);
     }
 
-    public static ItemStackSnapshot snap(ItemStack stack)
+    /**
+     * Creates a snapshot of the given item.
+     *
+     * @param stack The ItemStack to create a snapshot of.
+     *
+     * @return The snapshot, or {@code null} if the item was {@code null} or if
+     * an error occurred.
+     */
+    public static ItemStackSnapshot snap(final ItemStack stack)
     {
         if (stack == null) return null;
 
@@ -69,9 +119,8 @@ public class ItemStackSnapshot
         {
             return new ItemStackSnapshot(
                     stack.getType(),
-                    stack.getAmount(),
-                    stack.getDurability(),
-                    NBT.fromItemStack(stack)
+                    stack.getDurability(), stack.getAmount(),
+                    NBT.fromItemStack(stack).toHashMap()
             );
         }
         catch (NMSException e)
@@ -81,18 +130,30 @@ public class ItemStackSnapshot
         }
     }
 
+    /**
+     * Reconstructs an ItemStack from this snapshot.
+     *
+     * @return A new ItemStack reconstructed from this snapshot.
+     */
     public ItemStack reconstruct()
     {
-        return new ItemStack(Material.AIR); // TODO
+        return new ItemStackBuilder(id).data(durability).amount(amount).nbt(nbt)
+                .item();
     }
 
 
+    /**
+     * @return A JSON representation of this snapshot, usable as export.
+     */
     @Override
     public String toString()
     {
         return toJSONString();
     }
 
+    /**
+     * @return A JSON representation of this snapshot, usable as export.
+     */
     public JsonElement toJSON()
     {
         final JsonObject dump = new JsonObject();
@@ -112,8 +173,41 @@ public class ItemStackSnapshot
         return dump;
     }
 
+    /**
+     * @return A JSON representation of this snapshot, usable as export.
+     */
     public String toJSONString()
     {
         return GSON.toJson(toJSON());
+    }
+
+    /**
+     * Loads a snapshot from a JSON export.
+     *
+     * @param json The JSON data.
+     *
+     * @return A snapshot with these data inside.
+     */
+    public static ItemStackSnapshot fromJSONString(final String json)
+    {
+        return fromJSON(GSON.fromJson(json, JsonObject.class));
+    }
+
+    /**
+     * Loads a snapshot from a JSON export.
+     *
+     * @param json The JSON data.
+     *
+     * @return A snapshot with these data inside.
+     */
+    @SuppressWarnings ("unchecked")
+    public static ItemStackSnapshot fromJSON(final JsonObject json)
+    {
+        return new ItemStackSnapshot(
+                Material.getMaterial(json.getAsJsonPrimitive("id").getAsString()),
+                json.getAsJsonPrimitive("Damage").getAsShort(),
+                json.getAsJsonPrimitive("Count").getAsInt(),
+                (Map<String, Object>) GSON.fromJson(json.getAsJsonObject("NBT"), new TypeToken<HashMap<String, Object>>() {}.getType())
+        );
     }
 }

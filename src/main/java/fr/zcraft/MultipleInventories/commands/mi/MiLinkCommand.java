@@ -5,6 +5,8 @@ import fr.zcraft.zlib.components.commands.Command;
 import fr.zcraft.zlib.components.commands.CommandException;
 import fr.zcraft.zlib.components.commands.CommandInfo;
 import fr.zcraft.zlib.tools.PluginLogger;
+import fr.zcraft.zlib.tools.runners.RunTask;
+import org.bukkit.entity.Player;
 
 import java.util.List;
 
@@ -15,7 +17,22 @@ public final class MiLinkCommand extends Command
     @Override
     protected void run() throws CommandException
     {
-        PluginLogger.info(PlayerSnapshot.snap(playerSender()).toJSONString());
+        final Player player = playerSender();
+        final PlayerSnapshot snapshot = PlayerSnapshot.snap(player);
+        final String jsonDump = snapshot.toJSONString();
+
+        PluginLogger.info(jsonDump);
+
+        player.getInventory().clear();
+        player.getEnderChest().clear();
+
+        RunTask.later(new Runnable() {
+            @Override
+            public void run()
+            {
+                PlayerSnapshot.fromJSONString(jsonDump).reconstruct(player);
+            }
+        }, 20l);
     }
 
     @Override
