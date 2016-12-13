@@ -36,20 +36,28 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import fr.zcraft.zlib.tools.PluginLogger;
+import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 
 
 /**
  * A snapshot of a player state (inventories, experience, health, hunger,
- * saturation). The snapshot is frozen in time, and cannot be modified.
+ * saturation, potion effects). The snapshot is frozen in time, and cannot
+ * be modified.
  */
 public class PlayerSnapshot
 {
@@ -71,6 +79,8 @@ public class PlayerSnapshot
 
     private final ItemStackSnapshot[] armor;
 
+    private final Collection<PotionEffect> effects;
+
 
     /**
      * Creates a snapshot of a player using the given data. You should use
@@ -87,11 +97,12 @@ public class PlayerSnapshot
      * @param inventory  The player's inventory snapshot.
      * @param enderChest The player's ender chest snapshot.
      * @param armor      The player's armor snapshot.
+     * @param effects    The player's potion effects.
      *
      * @see #snap(Player) Easier method to create a snapshot that you should
      * use.
      */
-    public PlayerSnapshot(int level, float exp, int expTotal, int foodLevel, float exhaustion, float saturation, double health, double maxHealth, Map<Integer, ItemStackSnapshot> inventory, Map<Integer, ItemStackSnapshot> enderChest, ItemStackSnapshot[] armor)
+    public PlayerSnapshot(int level, float exp, int expTotal, int foodLevel, float exhaustion, float saturation, double health, double maxHealth, Map<Integer, ItemStackSnapshot> inventory, Map<Integer, ItemStackSnapshot> enderChest, ItemStackSnapshot[] armor, Collection<PotionEffect> effects)
     {
         this.level = level;
         this.exp = exp;
@@ -104,6 +115,7 @@ public class PlayerSnapshot
         this.inventory = inventory;
         this.enderChest = enderChest;
         this.armor = armor;
+        this.effects = effects;
     }
 
     /**
@@ -136,7 +148,8 @@ public class PlayerSnapshot
                 player.getMaxHealth(),
                 snapInventory(player.getInventory()),
                 snapInventory(player.getEnderChest()),
-                snapArmor
+                snapArmor,
+                player.getActivePotionEffects()
         );
     }
 
@@ -193,6 +206,12 @@ public class PlayerSnapshot
         }
 
         player.getInventory().setArmorContents(newArmor);
+
+        for (PotionEffect effect : player.getActivePotionEffects())
+            player.removePotionEffect(effect.getType());
+
+        for (PotionEffect effect : effects)
+            effect.apply(player);
     }
 
     /**
@@ -229,6 +248,18 @@ public class PlayerSnapshot
     public JsonElement toJSON()
     {
         final JsonObject dump = new JsonObject();
+        final JsonArray armorDump = new JsonArray();
+        final JsonArray effectsDump = new JsonArray();
+
+        for (final ItemStackSnapshot item : armor)
+        {
+            armorDump.add(item != null ? item.toJSON() : JsonNull.INSTANCE);
+        }
+
+        for (final PotionEffect effect : effects)
+        {
+            effectsDump.add(toJSON(effect));
+        }
 
         dump.addProperty("level", level);
         dump.addProperty("exp", exp);
@@ -239,17 +270,10 @@ public class PlayerSnapshot
         dump.addProperty("health", health);
         dump.addProperty("maxHealth", maxHealth);
 
-        final JsonArray armorDump = new JsonArray();
-
-        for (final ItemStackSnapshot item : armor)
-        {
-            armorDump.add(item != null ? item.toJSON() : JsonNull.INSTANCE);
-        }
-
         dump.add("armor", armorDump);
-
         dump.add("inventory", toJSON(inventory));
         dump.add("enderChest", toJSON(enderChest));
+        dump.add("effects", effectsDump);
 
         return dump;
     }
@@ -266,6 +290,20 @@ public class PlayerSnapshot
         {
             dump.add(entry.getKey().toString(), entry.getValue() != null ? entry.getValue().toJSON() : JsonNull.INSTANCE);
         }
+
+        return dump;
+    }
+
+    private JsonElement toJSON(final PotionEffect effect)
+    {
+        final JsonObject dump = new JsonObject();
+
+        dump.addProperty("type", effect.getType().getName());
+        dump.addProperty("duration", effect.getDuration());
+        dump.addProperty("amplifier", effect.getAmplifier());
+        dump.addProperty("ambient", effect.isAmbient());
+        dump.addProperty("has-particles", effect.hasParticles());
+        dump.addProperty("color", effect.getColor() != null ? effect.getColor().asRGB() : null);
 
         return dump;
     }
@@ -311,6 +349,14 @@ public class PlayerSnapshot
             armor[i] = !armorItem.isJsonNull() ? ItemStackSnapshot.fromJSON(armorItem.getAsJsonObject()) : null;
         }
 
+        final JsonArray jsonEffects = json.getAsJsonArray("effects");
+        final List<PotionEffect> effects = new ArrayList<>();
+
+        for (int i = 0; i < jsonEffects.size(); i++)
+        {
+            effects.add(potionEffectFromJSON(jsonEffects.get(i).getAsJsonObject()));
+        }
+
         return new PlayerSnapshot(
                 json.getAsJsonPrimitive("level").getAsInt(),
                 json.getAsJsonPrimitive("exp").getAsFloat(),
@@ -322,7 +368,8 @@ public class PlayerSnapshot
                 json.getAsJsonPrimitive("maxHealth").getAsDouble(),
                 inventoryFromJSON(json.getAsJsonObject("inventory")),
                 inventoryFromJSON(json.getAsJsonObject("enderChest")),
-                armor
+                armor,
+                effects
         );
     }
 
@@ -350,5 +397,19 @@ public class PlayerSnapshot
         }
 
         return snapshot;
+    }
+
+    private static PotionEffect potionEffectFromJSON(final JsonObject json)
+    {
+        final JsonPrimitive color = json.getAsJsonPrimitive("color");
+
+        return new PotionEffect(
+                PotionEffectType.getByName(json.getAsJsonPrimitive("type").getAsString()),
+                json.getAsJsonPrimitive("duration").getAsInt(),
+                json.getAsJsonPrimitive("amplifier").getAsInt(),
+                json.getAsJsonPrimitive("ambient").getAsBoolean(),
+                json.getAsJsonPrimitive("has-particles").getAsBoolean(),
+                color != null && !color.isJsonNull() ? Color.fromRGB(color.getAsInt()) : null
+        );
     }
 }

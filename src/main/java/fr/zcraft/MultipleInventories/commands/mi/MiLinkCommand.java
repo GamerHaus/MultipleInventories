@@ -7,6 +7,7 @@ import fr.zcraft.zlib.components.commands.CommandInfo;
 import fr.zcraft.zlib.tools.PluginLogger;
 import fr.zcraft.zlib.tools.runners.RunTask;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffect;
 
 import java.util.List;
 
@@ -25,6 +26,7 @@ public final class MiLinkCommand extends Command
 
         player.getInventory().clear();
         player.getEnderChest().clear();
+        for (PotionEffect effect : player.getActivePotionEffects()) player.removePotionEffect(effect.getType());
 
         RunTask.later(new Runnable() {
             @Override
