@@ -99,8 +99,6 @@ public class ItemStackSnapshot
         this.durability = durability;
         this.amount = amount;
         this.nbt = nbt;
-
-        PluginLogger.info("Constructed Item snapshot: {0}:{1}×{2}; NBT={3}", this.id, this.durability, this.amount, this.nbt);
     }
 
     /**
@@ -161,9 +159,10 @@ public class ItemStackSnapshot
         dump.addProperty("id", id.toString());
         dump.addProperty("Damage", durability);
         dump.addProperty("Count", amount);
+
         try
         {
-            dump.add("NBT", GSON.fromJson(nbt.toString(), JsonObject.class));
+            dump.add("NBT", GSON.toJsonTree(nbt));
         }
         catch (final JsonSyntaxException e)
         {

@@ -1,0 +1,32 @@
+# MultipleInventories configuration file
+# --------------------------------------
+
+# Friendly remainder: never use tabs here, always spaces.
+
+
+# If true, the players states will be separated by gamemode.
+per-gamemode-inventories: true
+
+
+# Here is the core thing, the worlds groups.
+#
+# When the player world change, if the old and the new world
+# are both in the same group, his inventory will not be changed.
+# Else, it will be.
+# If some worlds are not listed here, they will be placed in the
+# "default" group.
+#
+# The groups names are up to you, as long as they are valid YAML
+# (avoid spaces).
+#
+# Avoid worlds groups renaming, as it will break the players saves
+# (or do so with the server closed, and rename the folders in the
+# plugins/MultipleInventories/data folder).
+world-groups:
+    default:
+        - world
+        - world_nether
+        - world_the_end
+    another-group:
+        - such_world
+        - very_nether

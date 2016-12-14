@@ -56,8 +56,8 @@ import java.util.Map;
 
 /**
  * A snapshot of a player state (inventories, experience, health, hunger,
- * saturation, potion effects). The snapshot is frozen in time, and cannot
- * be modified.
+ * saturation, potion effects). The snapshot is frozen in time, and cannot be
+ * modified.
  */
 public class PlayerSnapshot
 {
@@ -124,8 +124,23 @@ public class PlayerSnapshot
      * @param player The player to snap.
      *
      * @return The snapshot, or {@code null} if the player was {@code null}.
+     * @see #snap(Player, boolean) Snapshot while respawning.
      */
     public static PlayerSnapshot snap(final Player player)
+    {
+        return snap(player, false);
+    }
+
+    /**
+     * Creates a snapshot of a player.
+     *
+     * @param player      The player to snap.
+     * @param fromRespawn {@code true} if the snapshot was taken after a
+     *                    respawn. It prevents storing empty health & hunger.
+     *
+     * @return The snapshot, or {@code null} if the player was {@code null}.
+     */
+    public static PlayerSnapshot snap(final Player player, boolean fromRespawn)
     {
         if (player == null) return null;
 
@@ -141,10 +156,10 @@ public class PlayerSnapshot
                 player.getLevel(),
                 player.getExp(),
                 player.getTotalExperience(),
-                player.getFoodLevel(),
-                player.getExhaustion(),
-                player.getSaturation(),
-                player.getHealth(),
+                !fromRespawn ? player.getFoodLevel() : 20,
+                !fromRespawn ? player.getExhaustion() : 0,
+                !fromRespawn ? player.getSaturation() : 5,
+                !fromRespawn ? player.getHealth() : player.getMaxHealth(),
                 player.getMaxHealth(),
                 snapInventory(player.getInventory()),
                 snapInventory(player.getEnderChest()),

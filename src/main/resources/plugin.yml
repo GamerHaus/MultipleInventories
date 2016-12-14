@@ -2,9 +2,31 @@ name: MultipleInventories
 version: 1.0
 main: fr.zcraft.MultipleInventories.MultipleInventories
 
-description: Multiple inventories actually working
+description: Multiple inventories actually working (and NBT aware)
 author: Amaury Carrade
 
 commands:
     mi:
         description: Multiple inventories main command
+
+
+permissions:
+    multipleinventories.*:
+        default: op
+        children:
+            multipleinventories.list: true
+            multipleinventories.reload: true
+            multipleinventories.import: true
+
+
+    multipleinventories.list:
+        description: "List world groups"
+        default: op
+
+    multipleinventories.reload:
+        description: "Reload world groups"
+        default: op
+
+    multipleinventories.import:
+        description: "Import data from MultiInv"
+        default: op

@@ -29,17 +29,44 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.zcraft.MultipleInventories.inventories;
+package fr.zcraft.MultipleInventories;
 
-import java.util.UUID;
+import org.bukkit.permissions.Permissible;
 
 
-/**
- * Stores the inventories of a player.
- */
-public class Inventories
+public enum Permissions
 {
-    private UUID playerID;
+    LIST("multipleinventories.list"),
+    RELOAD("multipleinventories.reload"),
+    IMPORT("multipleinventories.import"),
+
+    ;
 
 
+    private final String permission;
+
+    Permissions(String permission)
+    {
+        this.permission = permission;
+    }
+
+
+    /**
+     * @return the permission's name.
+     */
+    public String getPermission()
+    {
+        return permission;
+    }
+
+    /**
+     * Checks if this permission is granted to the given permissible.
+     *
+     * @param permissible The permissible to check.
+     * @return {@code true} if this permission is granted to the permissible.
+     */
+    public boolean grantedTo(Permissible permissible)
+    {
+        return permissible.hasPermission(permission);
+    }
 }
