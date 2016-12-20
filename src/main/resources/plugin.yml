@@ -5,6 +5,9 @@ main: fr.zcraft.MultipleInventories.MultipleInventories
 description: Multiple inventories actually working (and NBT aware)
 author: Amaury Carrade
 
+softdepend:
+    - MultiInv
+
 commands:
     mi:
         description: Multiple inventories main command

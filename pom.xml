@@ -57,6 +57,10 @@
             <id>zDevelopers</id>
             <url>http://maven.carrade.eu/artifactory/snapshots</url>
         </repository>
+        <repository>
+            <id>carrade-repo</id>
+            <url>https://raw.carrade.eu/maven2/</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -69,6 +73,11 @@
             <groupId>fr.zcraft</groupId>
             <artifactId>zlib</artifactId>
             <version>0.99-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>uk.co</groupId>
+            <artifactId>MultiInv</artifactId>
+            <version>3.3.6</version>
         </dependency>
     </dependencies>
 </project>

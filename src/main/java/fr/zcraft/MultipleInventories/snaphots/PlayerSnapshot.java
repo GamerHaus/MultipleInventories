@@ -88,7 +88,7 @@ public class PlayerSnapshot
      *
      * @param level      The XP level.
      * @param exp        The XP.
-     * @param expTotal   The total XP.
+     * @param expTotal   The total XP. -1 if unknown (e.g. from import).
      * @param foodLevel  The food level.
      * @param exhaustion The player's exhaustion.
      * @param saturation The player's saturation.
@@ -204,7 +204,7 @@ public class PlayerSnapshot
     {
         player.setLevel(level);
         player.setExp(exp);
-        player.setTotalExperience(expTotal);
+        if (expTotal >= 0) player.setTotalExperience(expTotal);
         player.setFoodLevel(foodLevel);
         player.setExhaustion(exhaustion);
         player.setSaturation(saturation);

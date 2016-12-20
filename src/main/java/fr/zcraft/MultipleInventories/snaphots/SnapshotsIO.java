@@ -53,7 +53,12 @@ public class SnapshotsIO extends Worker
 {
     private static File getFileForSnapshot(final UUID playerID, final String group, final GameMode gamemode)
     {
-        return new File(MultipleInventories.get().getDataFolder(), "snapshots" + File.separator + group + File.separator + playerID.toString() + "." + gamemode.name() + ".json");
+        return new File(
+                MultipleInventories.get().getDataFolder(),
+                "snapshots"
+                        + File.separator + group
+                        + File.separator + playerID.toString().substring(0, 2)
+                        + File.separator + playerID.toString() + "." + gamemode.name() + ".json");
     }
 
     public static void saveSnapshot(final UUID playerID, final String group, final GameMode gamemode, final PlayerSnapshot snapshot)
