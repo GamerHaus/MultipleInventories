@@ -99,6 +99,8 @@ public class ItemStackSnapshot
         this.durability = durability;
         this.amount = amount;
         this.nbt = nbt;
+
+        PluginLogger.info("Made snapshot of {0} with NBT data {1}", id, nbt);
     }
 
     /**
@@ -135,8 +137,7 @@ public class ItemStackSnapshot
      */
     public ItemStack reconstruct()
     {
-        return new ItemStackBuilder(id).data(durability).amount(amount).nbt(nbt)
-                .item();
+        return new ItemStackBuilder(id).data(durability).amount(amount).nbt(nbt).replaceNBT().craftItem();
     }
 
 

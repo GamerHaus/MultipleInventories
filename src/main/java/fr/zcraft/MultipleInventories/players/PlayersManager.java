@@ -44,6 +44,8 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerGameModeChangeEvent;
+import org.bukkit.event.player.PlayerKickEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.world.WorldLoadEvent;
@@ -165,6 +167,30 @@ public class PlayersManager extends ZLibComponent implements Listener
     public PlayerSnapshotsStore getStore(final Player player)
     {
         return getStore(player.getUniqueId());
+    }
+
+    /**
+     * Unloads the store of the given player, e.g. when logging out.
+     * The store will be re-loaded the next time {@link #getStore(UUID)}
+     * is called.
+     *
+     * @param playerID The player's UUID.
+     */
+    public void unloadStore(final UUID playerID)
+    {
+        players.remove(playerID);
+    }
+
+    /**
+     * Unloads the store of the given player, e.g. when logging out.
+     * The store will be re-loaded the next time {@link #getStore(Player)}
+     * is called.
+     *
+     * @param player The player.
+     */
+    public void unloadStore(final Player player)
+    {
+        unloadStore(player.getUniqueId());
     }
 
     /**
@@ -294,6 +320,23 @@ public class PlayersManager extends ZLibComponent implements Listener
 
     /* **  EVENT HANDLERS  ** */
 
+    private void unloadStoreLater(final Player player)
+    {
+        final UUID playerID = player.getUniqueId();
+
+        RunTask.later(new Runnable() {
+            @Override
+            public void run()
+            {
+                final Player player = Bukkit.getPlayer(playerID);
+                if (player == null || !player.isOnline())
+                {
+                    unloadStore(playerID);
+                }
+            }
+        }, 10 * 20l);
+    }
+
 
     @EventHandler (priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onAsyncPlayerLogin(final AsyncPlayerPreLoginEvent ev)
@@ -302,6 +345,18 @@ public class PlayersManager extends ZLibComponent implements Listener
         {
             getStore(ev.getUniqueId());
         }
+    }
+
+    @EventHandler (priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onPlayerLogout(final PlayerQuitEvent ev)
+    {
+        unloadStoreLater(ev.getPlayer());
+    }
+
+    @EventHandler (priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onPlayerLogout(final PlayerKickEvent ev)
+    {
+        unloadStoreLater(ev.getPlayer());
     }
 
     @EventHandler (priority = EventPriority.MONITOR, ignoreCancelled = true)
