@@ -12,7 +12,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 
 
-@CommandInfo (name = "reload", usageParameters = "")
+@CommandInfo (name = "reload")
 public final class MiReloadCommand extends Command
 {
     @Override
@@ -26,15 +26,9 @@ public final class MiReloadCommand extends Command
 
         player.getInventory().clear();
         player.getEnderChest().clear();
-        for (PotionEffect effect : player.getActivePotionEffects()) player.removePotionEffect(effect.getType());
+        player.getActivePotionEffects().stream().map(PotionEffect::getType).forEach(player::removePotionEffect);
 
-        RunTask.later(new Runnable() {
-            @Override
-            public void run()
-            {
-                PlayerSnapshot.fromJSONString(jsonDump).reconstruct(player);
-            }
-        }, 20l);
+        RunTask.later(() -> PlayerSnapshot.fromJSONString(jsonDump).reconstruct(player), 20L);
     }
 
     @Override

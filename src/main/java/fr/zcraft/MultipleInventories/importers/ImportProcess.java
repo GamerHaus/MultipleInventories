@@ -43,7 +43,6 @@ import org.bukkit.GameMode;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -51,6 +50,7 @@ import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayDeque;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Queue;
@@ -105,14 +105,12 @@ public class ImportProcess
         importListener = new ImportListener();
         ZLib.registerEvents(importListener);
 
-        for (Player player : Bukkit.getOnlinePlayers())
-            player.kickPlayer(I.t("{ce}Maintenance, please come back later."));
+        Bukkit.getOnlinePlayers().forEach(player -> player.kickPlayer(I.t("{ce}Maintenance, please come back later.")));
 
         running = true;
         importer.onBegin();
 
-        for (OfflinePlayer player : Bukkit.getOfflinePlayers())
-            importQueue.offer(player);
+        Arrays.stream(Bukkit.getOfflinePlayers()).forEach(importQueue::offer);
 
         playersCountToProcess = importQueue.size();
 
@@ -123,12 +121,9 @@ public class ImportProcess
         log(I.t("{cs}Check the console for progress update."));
 
         PluginLogger.info("Groups found by the importer:");
-        for (final Map.Entry<String, Set<String>> entry : worldGroups.entrySet())
-        {
-            PluginLogger.info("- {0}, with worlds: {1}", entry.getKey(), StringUtils.join(entry.getValue(), ", "));
-        }
+        worldGroups.forEach((group, worlds) -> PluginLogger.info("- {0}, with worlds: {1}", group, StringUtils.join(worlds, ", ")));
 
-        RunTask.timer(new ImportRunnable(), 2l, RUN_EVERY_N_TICKS);
+        RunTask.timer(new ImportRunnable(), 2L, RUN_EVERY_N_TICKS);
     }
 
     /**

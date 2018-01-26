@@ -48,10 +48,13 @@ import uk.co.tggl.pluckerpluck.multiinv.inventory.MIInventory;
 import uk.co.tggl.pluckerpluck.multiinv.inventory.MIItemStack;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 
 public class MultiInvImporter implements Importer
@@ -103,7 +106,7 @@ public class MultiInvImporter implements Importer
 
         for (final Map.Entry<String, String> group : reversedGroups.entrySet())
         {
-            final Set<String> worldsInGroup = groups.containsKey(group.getValue()) ? groups.get(group.getValue()) : new HashSet<String>();
+            final Set<String> worldsInGroup = groups.containsKey(group.getValue()) ? groups.get(group.getValue()) : new HashSet<>();
             worldsInGroup.add(group.getKey());
             groups.put(group.getValue(), worldsInGroup);
         }
@@ -190,28 +193,16 @@ public class MultiInvImporter implements Importer
 
     private Map<Integer, ItemStackSnapshot> importInventory(MIItemStack[] items)
     {
-        final Map<Integer, ItemStackSnapshot> imported = new HashMap<>();
-
-        for (int i = 0; i < items.length; i++)
-        {
-            if (items[i] != null)
-            {
-                imported.put(i, ItemStackSnapshot.snap(items[i].getItemStack()));
-            }
-        }
-
-        return imported;
+        return IntStream.range(0, items.length)
+                        .filter(i -> items[i] != null)
+                        .boxed()
+                        .collect(Collectors.toMap(i -> i, i -> ItemStackSnapshot.snap(items[i].getItemStack()), (a, b) -> b));
     }
 
     private ItemStackSnapshot[] importInventoryToArray(MIItemStack[] items)
     {
-        final ItemStackSnapshot[] imported = new ItemStackSnapshot[items.length];
-
-        for (int i = 0; i < items.length; i++)
-        {
-            imported[i] = items[i] != null ? ItemStackSnapshot.snap(items[i].getItemStack()) : null;
-        }
-
-        return imported;
+        return Arrays.stream(items)
+                     .map(item -> item != null ? ItemStackSnapshot.snap(item.getItemStack()) : null)
+                     .toArray(ItemStackSnapshot[]::new);
     }
 }

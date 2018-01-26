@@ -53,7 +53,6 @@ import org.bukkit.event.world.WorldLoadEvent;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -76,17 +75,7 @@ public class PlayersManager extends ZLibComponent implements Listener
 
         // The snapshot IO needs the players manager, so if this is executed directly in the enable method,
         // the import will crash on reload.
-        RunTask.nextTick(new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                for (final Player player : Bukkit.getOnlinePlayers())
-                {
-                    getStore(player);
-                }
-            }
-        });
+        RunTask.nextTick(() -> Bukkit.getOnlinePlayers().forEach(this::getStore));
     }
 
     /**
@@ -97,24 +86,21 @@ public class PlayersManager extends ZLibComponent implements Listener
         worldsGroups.clear();
         reversedWorldGroups.clear();
 
-        for (final Map.Entry<String, List> entry : Config.WORLD_GROUPS.entrySet())
+        Config.WORLD_GROUPS.forEach((group_name, worlds_names) ->
         {
             final Set<String> worlds = new HashSet<>();
 
-            for (final Object world : entry.getValue())
+            for (final Object world : worlds_names)
             {
                 worlds.add(world.toString());
-                reversedWorldGroups.put(world.toString(), entry.getKey());
+                reversedWorldGroups.put(world.toString(), group_name);
             }
 
-            worldsGroups.put(entry.getKey(), worlds);
-        }
+            worldsGroups.put(group_name, worlds);
+        });
 
         // We store non-listed worlds in the default group
-        for (final World world : Bukkit.getWorlds())
-        {
-            registerWorldInDefault(world);
-        }
+        Bukkit.getWorlds().forEach(this::registerWorldInDefault);
     }
 
     /**
@@ -157,7 +143,7 @@ public class PlayersManager extends ZLibComponent implements Listener
 
     /**
      * Creates, queue load and return a store for the given player. If the store
-     * was already loaded, it is returned directly (this will probably be the
+     * is already loaded, it is returned directly (this will probably be the
      * most common case).
      *
      * @param player The player.
@@ -266,14 +252,9 @@ public class PlayersManager extends ZLibComponent implements Listener
         store.setChangesBeingApplied(true);
         store.saveSnapshot(oldGroup, gamemode, PlayerSnapshot.snap(player, isRespawn));
 
-        RunTask.nextTick(new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                store.applySnapshot(newGroup, gamemode);
-                store.setChangesBeingApplied(false);
-            }
+        RunTask.nextTick(() ->{
+            store.applySnapshot(newGroup, gamemode);
+            store.setChangesBeingApplied(false);
         });
 
         return true;
@@ -303,14 +284,9 @@ public class PlayersManager extends ZLibComponent implements Listener
         store.setChangesBeingApplied(true);
         store.saveSnapshot(group, oldGameMode, PlayerSnapshot.snap(player));
 
-        RunTask.nextTick(new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                store.applySnapshot(group, newGameMode);
-                store.setChangesBeingApplied(false);
-            }
+        RunTask.nextTick(() -> {
+            store.applySnapshot(group, newGameMode);
+            store.setChangesBeingApplied(false);
         });
 
         return true;
@@ -324,17 +300,14 @@ public class PlayersManager extends ZLibComponent implements Listener
     {
         final UUID playerID = player.getUniqueId();
 
-        RunTask.later(new Runnable() {
-            @Override
-            public void run()
+        RunTask.later(() ->
+        {
+            final Player player1 = Bukkit.getPlayer(playerID);
+            if (player1 == null || !player1.isOnline())
             {
-                final Player player = Bukkit.getPlayer(playerID);
-                if (player == null || !player.isOnline())
-                {
-                    unloadStore(playerID);
-                }
+                unloadStore(playerID);
             }
-        }, 10 * 20l);
+        }, 60 * 20L);
     }
 
 

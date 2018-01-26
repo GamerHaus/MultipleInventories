@@ -31,12 +31,13 @@
  */
 package fr.zcraft.MultipleInventories.snaphots;
 
-import com.google.gson.Gson;
+import com.google.common.collect.Streams;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import fr.zcraft.MultipleInventories.MultipleInventories;
 import fr.zcraft.zlib.tools.PluginLogger;
 import org.bukkit.Color;
 import org.bukkit.Material;
@@ -46,12 +47,13 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 
 /**
@@ -61,8 +63,6 @@ import java.util.Map;
  */
 public class PlayerSnapshot
 {
-    private static final Gson GSON = new Gson();
-
     private final int level;
     private final float exp;
     private final int expTotal;
@@ -144,13 +144,7 @@ public class PlayerSnapshot
     {
         if (player == null) return null;
 
-        final ItemStack[] armor = player.getInventory().getArmorContents();
-        final ItemStackSnapshot[] snapArmor = new ItemStackSnapshot[armor.length];
-
-        for (int i = 0; i < armor.length; i++)
-        {
-            snapArmor[i] = ItemStackSnapshot.snap(armor[i]);
-        }
+        final ItemStackSnapshot[] snapArmor = Arrays.stream(player.getInventory().getArmorContents()).map(ItemStackSnapshot::snap).toArray(ItemStackSnapshot[]::new);
 
         return new PlayerSnapshot(
                 player.getLevel(),
@@ -222,11 +216,9 @@ public class PlayerSnapshot
 
         player.getInventory().setArmorContents(newArmor);
 
-        for (PotionEffect effect : player.getActivePotionEffects())
-            player.removePotionEffect(effect.getType());
+        player.getActivePotionEffects().stream().map(PotionEffect::getType).forEach(player::removePotionEffect);
 
-        for (PotionEffect effect : effects)
-            effect.apply(player);
+        effects.forEach(effect -> effect.apply(player));
     }
 
     /**
@@ -238,11 +230,7 @@ public class PlayerSnapshot
     private void reconstructInventory(final Inventory inventory, final Map<Integer, ItemStackSnapshot> snapshot)
     {
         inventory.clear();
-
-        for (final Map.Entry<Integer, ItemStackSnapshot> entry : snapshot.entrySet())
-        {
-            inventory.setItem(entry.getKey(), entry.getValue().reconstruct());
-        }
+        snapshot.forEach((index, itemSnapshot) -> inventory.setItem(index, itemSnapshot.reconstruct()));
     }
 
 
@@ -266,15 +254,9 @@ public class PlayerSnapshot
         final JsonArray armorDump = new JsonArray();
         final JsonArray effectsDump = new JsonArray();
 
-        for (final ItemStackSnapshot item : armor)
-        {
-            armorDump.add(item != null ? item.toJSON() : JsonNull.INSTANCE);
-        }
+        Arrays.stream(armor).map(item -> item != null ? item.toJSON() : JsonNull.INSTANCE).forEachOrdered(armorDump::add);
 
-        for (final PotionEffect effect : effects)
-        {
-            effectsDump.add(toJSON(effect));
-        }
+        effects.stream().map(this::toJSON).forEach(effectsDump::add);
 
         dump.addProperty("level", level);
         dump.addProperty("exp", exp);
@@ -294,21 +276,20 @@ public class PlayerSnapshot
     }
 
     /**
-     * @return A JSON export of this snapshot (including inventories and {@link
-     * ItemStackSnapshot item snapshots}.
+     * @return A JSON export of an inventory.
      */
     private JsonElement toJSON(final Map<Integer, ItemStackSnapshot> inventory)
     {
         final JsonObject dump = new JsonObject();
 
-        for (Map.Entry<Integer, ItemStackSnapshot> entry : inventory.entrySet())
-        {
-            dump.add(entry.getKey().toString(), entry.getValue() != null ? entry.getValue().toJSON() : JsonNull.INSTANCE);
-        }
+        inventory.forEach((index, itemSnapshot) -> dump.add(index.toString(), itemSnapshot != null ? itemSnapshot.toJSON() : JsonNull.INSTANCE));
 
         return dump;
     }
 
+    /**
+     * @return A JSON export of the given potion effect.
+     */
     private JsonElement toJSON(final PotionEffect effect)
     {
         final JsonObject dump = new JsonObject();
@@ -329,7 +310,7 @@ public class PlayerSnapshot
      */
     public String toJSONString()
     {
-        return GSON.toJson(toJSON());
+        return MultipleInventories.GSON.toJson(toJSON());
     }
 
     /**
@@ -342,7 +323,7 @@ public class PlayerSnapshot
      */
     public static PlayerSnapshot fromJSONString(final String json)
     {
-        return fromJSON(GSON.fromJson(json, JsonObject.class));
+        return fromJSON(MultipleInventories.GSON.fromJson(json, JsonObject.class));
     }
 
     /**
@@ -365,12 +346,9 @@ public class PlayerSnapshot
         }
 
         final JsonArray jsonEffects = json.getAsJsonArray("effects");
-        final List<PotionEffect> effects = new ArrayList<>();
-
-        for (int i = 0; i < jsonEffects.size(); i++)
-        {
-            effects.add(potionEffectFromJSON(jsonEffects.get(i).getAsJsonObject()));
-        }
+        final List<PotionEffect> effects = Streams.stream(jsonEffects)
+                                                  .map(jsonEffect -> potionEffectFromJSON(jsonEffect.getAsJsonObject()))
+                                                  .collect(Collectors.toList());
 
         return new PlayerSnapshot(
                 json.getAsJsonPrimitive("level").getAsInt(),
@@ -399,7 +377,7 @@ public class PlayerSnapshot
     {
         final Map<Integer, ItemStackSnapshot> snapshot = new HashMap<>();
 
-        for (Map.Entry<String, JsonElement> jsonItemEntry : json.entrySet())
+        json.entrySet().forEach(jsonItemEntry ->
         {
             try
             {
@@ -409,7 +387,7 @@ public class PlayerSnapshot
             {
                 PluginLogger.error("Skipping item with invalid index {0} from JSON snapshot", jsonItemEntry.getKey());
             }
-        }
+        });
 
         return snapshot;
     }

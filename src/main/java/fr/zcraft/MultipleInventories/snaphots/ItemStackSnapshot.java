@@ -31,11 +31,11 @@
  */
 package fr.zcraft.MultipleInventories.snaphots;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
+import fr.zcraft.MultipleInventories.MultipleInventories;
 import fr.zcraft.zlib.components.nbt.NBT;
 import fr.zcraft.zlib.components.nbt.NBTCompound;
 import fr.zcraft.zlib.tools.PluginLogger;
@@ -54,8 +54,6 @@ import java.util.Map;
  */
 public class ItemStackSnapshot
 {
-    private static final Gson GSON = new Gson();
-
     private final Material id;
     private final short durability;
     private final int amount;
@@ -163,7 +161,7 @@ public class ItemStackSnapshot
 
         try
         {
-            dump.add("NBT", GSON.toJsonTree(nbt));
+            dump.add("NBT", MultipleInventories.GSON.toJsonTree(nbt));
         }
         catch (final JsonSyntaxException e)
         {
@@ -178,7 +176,7 @@ public class ItemStackSnapshot
      */
     public String toJSONString()
     {
-        return GSON.toJson(toJSON());
+        return MultipleInventories.GSON.toJson(toJSON());
     }
 
     /**
@@ -190,7 +188,7 @@ public class ItemStackSnapshot
      */
     public static ItemStackSnapshot fromJSONString(final String json)
     {
-        return fromJSON(GSON.fromJson(json, JsonObject.class));
+        return fromJSON(MultipleInventories.GSON.fromJson(json, JsonObject.class));
     }
 
     /**
@@ -207,7 +205,7 @@ public class ItemStackSnapshot
                 Material.getMaterial(json.getAsJsonPrimitive("id").getAsString()),
                 json.getAsJsonPrimitive("Damage").getAsShort(),
                 json.getAsJsonPrimitive("Count").getAsInt(),
-                (Map<String, Object>) GSON.fromJson(json.getAsJsonObject("NBT"), new TypeToken<HashMap<String, Object>>() {}.getType())
+                (Map<String, Object>) MultipleInventories.GSON.fromJson(json.getAsJsonObject("NBT"), new TypeToken<HashMap<String, Object>>() {}.getType())
         );
     }
 }

@@ -4,17 +4,16 @@ import fr.zcraft.MultipleInventories.Permissions;
 import fr.zcraft.MultipleInventories.importers.ImportProcess;
 import fr.zcraft.MultipleInventories.importers.MultiInvImporter;
 import fr.zcraft.zlib.components.commands.Command;
-import fr.zcraft.zlib.components.commands.CommandException;
 import fr.zcraft.zlib.components.commands.CommandInfo;
 import fr.zcraft.zlib.components.i18n.I;
 import org.bukkit.command.CommandSender;
 
 
-@CommandInfo (name = "import", usageParameters = "")
+@CommandInfo (name = "import")
 public final class MiImportCommand extends Command
 {
     @Override
-    protected void run() throws CommandException
+    protected void run()
     {
         if (args.length == 0 || !args[0].equalsIgnoreCase("confirm"))
         {

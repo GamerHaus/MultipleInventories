@@ -98,7 +98,7 @@ public class SnapshotsIO extends Worker
 
         submitQuery(new WorkerRunnable<Map<String, Map<GameMode, PlayerSnapshot>>>() {
             @Override
-            public Map<String, Map<GameMode, PlayerSnapshot>> run() throws Throwable
+            public Map<String, Map<GameMode, PlayerSnapshot>> run()
             {
                 final Map<String, Map<GameMode, PlayerSnapshot>> snapshots = new ConcurrentHashMap<>();
 

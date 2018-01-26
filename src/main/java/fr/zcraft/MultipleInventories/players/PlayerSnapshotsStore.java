@@ -118,7 +118,7 @@ public class PlayerSnapshotsStore
         final Map<GameMode, PlayerSnapshot> groupSnapshots = snapshots.get(group);
         if (groupSnapshots == null) return null;
 
-        return groupSnapshots.containsKey(gamemode) ? groupSnapshots.get(gamemode) : null;
+        return groupSnapshots.getOrDefault(gamemode, null);
     }
 
     /**
@@ -206,7 +206,7 @@ public class PlayerSnapshotsStore
      * @param changesBeingApplied {@code true} if state save/update is being
      *                            processed for this player.
      */
-    public void setChangesBeingApplied(boolean changesBeingApplied)
+    void setChangesBeingApplied(boolean changesBeingApplied)
     {
         this.changesBeingApplied = changesBeingApplied;
     }
