@@ -49,6 +49,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.time.LocalTime;
 import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -59,7 +60,7 @@ import java.util.Set;
 
 public class ImportProcess
 {
-    private final static int PLAYERS_PER_TICK = 32;
+    private final static int PLAYERS_PER_TICK = 16;
     private final static int RUN_EVERY_N_TICKS = 1;
 
     private final Importer importer;
@@ -71,7 +72,9 @@ public class ImportProcess
 
     private int playersCountToProcess = 0;
     private int lastPercentage = -1;
+    private double meanExecutionTimePerPlayer = 0.0;
 
+    private boolean started = false;
     private boolean running = false;
     private ImportListener importListener;
 
@@ -105,8 +108,10 @@ public class ImportProcess
         importListener = new ImportListener();
         ZLib.registerEvents(importListener);
 
-        Bukkit.getOnlinePlayers().forEach(player -> player.kickPlayer(I.t("{ce}Maintenance, please come back later.")));
+        Bukkit.getOnlinePlayers()
+              .forEach(player -> player.kickPlayer(I.t("{ce}Maintenance started, please come back later.") + "\n\n" + I.t("{gray}ETA: {0}", getHumanFriendlyETA())));
 
+        started = true;
         running = true;
         importer.onBegin();
 
@@ -117,11 +122,19 @@ public class ImportProcess
         worldGroups.clear();
         worldGroups.putAll(importer.getWorldGroups());
 
-        log(I.t("{cs}Starting import, processing {0} players every {1} ticks, {2} players total ({3} minutes to go).", PLAYERS_PER_TICK, RUN_EVERY_N_TICKS, playersCountToProcess, Math.ceil((RUN_EVERY_N_TICKS / 20.0) * (playersCountToProcess / PLAYERS_PER_TICK))));
-        log(I.t("{cs}Check the console for progress update."));
+        log(
+                I.tn(
+                        "{cs}Starting import, processing {0} player every {1} ticks, {2} players total.",
+                        "{cs}Starting import, processing {0} players every {1} ticks, {2} players total.",
+                        PLAYERS_PER_TICK,
+                        PLAYERS_PER_TICK, RUN_EVERY_N_TICKS, playersCountToProcess
+                )
+        );
 
-        PluginLogger.info("Groups found by the importer:");
-        worldGroups.forEach((group, worlds) -> PluginLogger.info("- {0}, with worlds: {1}", group, StringUtils.join(worlds, ", ")));
+        PluginLogger.info(I.t("Groups found by the importer:"));
+        worldGroups.forEach((group, worlds) -> PluginLogger.info(
+                I.tn("- {0}, with world: {1}", "- {0}, with worlds: {1}", worlds.size(), group, StringUtils.join(worlds, ", "))
+        ));
 
         RunTask.timer(new ImportRunnable(), 2L, RUN_EVERY_N_TICKS);
     }
@@ -135,9 +148,6 @@ public class ImportProcess
 
         importer.onEnd();
         running = false;
-
-        ZLib.unregisterEvents(importListener);
-        importListener = null;
     }
 
     /**
@@ -154,6 +164,32 @@ public class ImportProcess
     public int getAmountProcessed()
     {
         return playersCountToProcess - importQueue.size();
+    }
+
+    /**
+     * @return The estimated time remaining, in seconds.
+     */
+    public int getETA()
+    {
+        return (int) Math.ceil((meanExecutionTimePerPlayer / 1000.0) * importQueue.size());
+    }
+
+    /**
+     * @return The estimated time remaining, formatted for human read.
+     */
+    public String getHumanFriendlyETA()
+    {
+        final int eta = getETA();
+        if (eta > 0)
+        {
+            String friendlyETA = LocalTime.MIN.plusSeconds(eta).toString();
+
+            // Adds seconds if needed, as LocalTime does not includes them if zero.
+            if (friendlyETA.length() == 5) friendlyETA += ":00";
+
+            return friendlyETA;
+        }
+        else return I.t("currently unknown");
     }
 
     /**
@@ -180,6 +216,8 @@ public class ImportProcess
                     return;
                 }
 
+                long t = System.currentTimeMillis();
+
                 for (final String group : worldGroups.keySet())
                 {
                     for (final GameMode mode : GameMode.values())
@@ -189,10 +227,24 @@ public class ImportProcess
                     }
                 }
 
-                final int percentage = (int) Math.rint((((double) (playersCountToProcess - importQueue.size())) / ((double) playersCountToProcess)) * 100);
+                // Calculates the cumulative moving average so we can estimate the time left
+                final double executionTime = (double) (System.currentTimeMillis() - t);
+                final double amountProcessed = (double) getAmountProcessed();
+
+                meanExecutionTimePerPlayer = (executionTime + (amountProcessed - 1) * meanExecutionTimePerPlayer) / amountProcessed;
+
+                // …and the percentage, to be displayed when it changes.
+                final int percentage = (int) Math.floor((((double) (playersCountToProcess - importQueue.size())) / ((double) playersCountToProcess)) * 100);
                 if (percentage != lastPercentage)
                 {
-                    PluginLogger.info("Importing snapshots from {0}: {1}%... ({2} / {3})", importerName, percentage, playersCountToProcess - importQueue.size(), playersCountToProcess);
+                    PluginLogger.info(
+                            I.t(
+                                    "Importing snapshots from {0}: {1}%... ({2} / {3}) - ETA {4} ({5} ms per player)",
+                                    importerName, percentage, playersCountToProcess - importQueue.size(),
+                                    playersCountToProcess, getHumanFriendlyETA(), meanExecutionTimePerPlayer
+                            )
+                    );
+
                     lastPercentage = percentage;
                 }
             }
@@ -206,7 +258,26 @@ public class ImportProcess
         {
             if (running)
             {
-                ev.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, I.t("\n{ce}Maintenance in progress, please come back later.\n\n{gray}{0}% completed ({1} / {2})", getProgressPercentage(), getAmountProcessed(), getPlayersCountToProcess()));
+
+                ev.disallow(
+                        AsyncPlayerPreLoginEvent.Result.KICK_OTHER,
+                        "\n" + I.t("{ce}Maintenance in progress, please come back later.") + "\n\n" +
+                                /// Completion displayed in the kick message when a player tries to login during a migration.
+                                I.t("{gray}{0}% completed ({1} / {2})", getProgressPercentage(), getAmountProcessed(), getPlayersCountToProcess()) + "\n" +
+                                /// ETA displayed in the kick message when a player tries to login during a migration.
+                                I.t("{gray}ETA: {0}", getHumanFriendlyETA())
+                );
+            }
+            else if (started)
+            {
+                ev.disallow(
+                        AsyncPlayerPreLoginEvent.Result.KICK_OTHER,
+                        "\n" + I.t("{ce}Maintenance in progress, please come back later.") + "\n\n" +
+                                /// Message displayed to the player when the migration is finished and the admin is needed to reboot
+                                I.t("{gray}The migration completed; we still need an admin to finish the migration by hand and reboot the server.") + "\n" +
+                                /// Message displayed to the player when the migration is finished and the admin is needed to reboot
+                                I.t("{gray}If you are the admin, check out the console.")
+                );
             }
         }
     }

@@ -4,6 +4,11 @@
 # Friendly remainder: never use tabs here, always spaces.
 
 
+# The plugin's locale. en_US or fr_FR. If empty, guesses the
+# locale according to the server's environment.
+locale:
+
+
 # If true, the players states will be separated by gamemode.
 per-gamemode-inventories: true
 

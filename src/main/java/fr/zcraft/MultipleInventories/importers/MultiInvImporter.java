@@ -33,6 +33,7 @@ package fr.zcraft.MultipleInventories.importers;
 
 import fr.zcraft.MultipleInventories.snaphots.ItemStackSnapshot;
 import fr.zcraft.MultipleInventories.snaphots.PlayerSnapshot;
+import fr.zcraft.zlib.components.i18n.I;
 import fr.zcraft.zlib.tools.PluginLogger;
 import fr.zcraft.zlib.tools.reflection.Reflection;
 import org.bukkit.Bukkit;
@@ -40,7 +41,6 @@ import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.potion.PotionEffect;
 import uk.co.tggl.pluckerpluck.multiinv.MultiInv;
 import uk.co.tggl.pluckerpluck.multiinv.api.MIAPIPlayer;
 import uk.co.tggl.pluckerpluck.multiinv.inventory.MIEnderchestInventory;
@@ -53,8 +53,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 
 public class MultiInvImporter implements Importer
@@ -94,7 +92,9 @@ public class MultiInvImporter implements Importer
     }
 
     @Override
-    public void onEnd() {}
+    public void onEnd() {
+        PluginLogger.info(I.t("The migration finished! Now, please remove MultiInv and reboot the server. Then, the players will be able to connect again, and the whole process will be done."));
+    }
 
     @Override
     public Map<String, Set<String>> getWorldGroups()
@@ -164,10 +164,10 @@ public class MultiInvImporter implements Importer
                 miSnapshot.getSaturation(),
                 miSnapshot.getHealth(),
                 20,
-                inventory  != null ? importInventory(inventory.getInventoryContents())    : new HashMap<Integer, ItemStackSnapshot>(),
-                enderChest != null ? importInventory(enderChest.getInventoryContents())   : new HashMap<Integer, ItemStackSnapshot>(),
+                inventory  != null ? importInventory(inventory.getInventoryContents())    : new HashMap<>(),
+                enderChest != null ? importInventory(enderChest.getInventoryContents())   : new HashMap<>(),
                 inventory  != null ? importInventoryToArray(inventory.getArmorContents()) : new ItemStackSnapshot[] {null, null, null, null},
-                inventory  != null ? inventory.getPotions()                               : new ArrayList<PotionEffect>()
+                inventory  != null ? inventory.getPotions()                               : new ArrayList<>()
         );
     }
 
@@ -193,10 +193,19 @@ public class MultiInvImporter implements Importer
 
     private Map<Integer, ItemStackSnapshot> importInventory(MIItemStack[] items)
     {
-        return IntStream.range(0, items.length)
-                        .filter(i -> items[i] != null)
-                        .boxed()
-                        .collect(Collectors.toMap(i -> i, i -> ItemStackSnapshot.snap(items[i].getItemStack()), (a, b) -> b));
+        final Map<Integer, ItemStackSnapshot> map = new HashMap<>();
+
+        if (items == null || items.length == 0) return map;
+
+        for (int i = 0; i < items.length; i++)
+        {
+            if (items[i] != null)
+            {
+                map.put(i, ItemStackSnapshot.snap(items[i].getItemStack()));
+            }
+        }
+
+        return map;
     }
 
     private ItemStackSnapshot[] importInventoryToArray(MIItemStack[] items)

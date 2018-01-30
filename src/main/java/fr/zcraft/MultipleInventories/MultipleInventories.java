@@ -30,6 +30,8 @@ public final class MultipleInventories extends ZPlugin implements Listener
 
         loadComponents(Commands.class, Config.class, SnapshotsIO.class, I18n.class);
 
+        I18n.setPrimaryLocale(Config.LOCALE.get());
+
         playersManager = loadComponent(PlayersManager.class);
 
         // noinspection unchecked
