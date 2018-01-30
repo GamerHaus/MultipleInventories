@@ -1,9 +1,6 @@
 package fr.zcraft.MultipleInventories;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.JsonSerializer;
 import fr.zcraft.MultipleInventories.commands.mi.MiImportCommand;
 import fr.zcraft.MultipleInventories.commands.mi.MiListCommand;
 import fr.zcraft.MultipleInventories.commands.mi.MiNBTDebugCommand;
@@ -18,17 +15,7 @@ import org.bukkit.event.Listener;
 
 public final class MultipleInventories extends ZPlugin implements Listener
 {
-    public static final Gson GSON = new GsonBuilder()
-            .serializeNulls()
-            .registerTypeAdapter(Double.class, (JsonSerializer<Double>) (src, srcType, context) ->
-            {
-                if (src == src.longValue())
-                {
-                    return new JsonPrimitive(src.longValue());
-                }
-                return new JsonPrimitive(src);
-            })
-            .create();
+    public static final Gson GSON = new Gson();
 
     private static MultipleInventories instance;
 

@@ -33,8 +33,9 @@ package fr.zcraft.MultipleInventories.snaphots;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSyntaxException;
-import com.google.gson.reflect.TypeToken;
 import fr.zcraft.MultipleInventories.MultipleInventories;
 import fr.zcraft.zlib.components.nbt.NBT;
 import fr.zcraft.zlib.components.nbt.NBTCompound;
@@ -44,7 +45,10 @@ import fr.zcraft.zlib.tools.reflection.NMSException;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -97,8 +101,6 @@ public class ItemStackSnapshot
         this.durability = durability;
         this.amount = amount;
         this.nbt = nbt;
-
-        PluginLogger.info("Made snapshot of {0} with NBT data {1}", id, nbt);
     }
 
     /**
@@ -188,7 +190,7 @@ public class ItemStackSnapshot
      */
     public static ItemStackSnapshot fromJSONString(final String json)
     {
-        return fromJSON(MultipleInventories.GSON.fromJson(json, JsonObject.class));
+        return fromJSON((new JsonParser().parse(json)).getAsJsonObject());
     }
 
     /**
@@ -205,7 +207,147 @@ public class ItemStackSnapshot
                 Material.getMaterial(json.getAsJsonPrimitive("id").getAsString()),
                 json.getAsJsonPrimitive("Damage").getAsShort(),
                 json.getAsJsonPrimitive("Count").getAsInt(),
-                (Map<String, Object>) MultipleInventories.GSON.fromJson(json.getAsJsonObject("NBT"), new TypeToken<HashMap<String, Object>>() {}.getType())
+                jsonToNative(json.getAsJsonObject("NBT"))
         );
+    }
+
+    /**
+     * From a JSON object, constructs a {@link Map Map&lt;String, Object&gt;} representing
+     * the same structure (recursively) using native types.
+     *
+     * <p>GSON could have been used to achieve this, using something like</p>
+     * <pre>
+     *     (Map<String, Object>) GSON.fromJson(
+     *         json,
+     *         new TypeToken<HashMap<String, Object>>() {}.getType()
+     *     )
+     * </pre>
+     * <p>…but if used this way, it loses precision on all big numbers
+     * (e.g. {@code -4823875203713330821} become {@code -4823875203713331200}…).
+     * The ultimate precision on such big integers/longs s <strong>critical</strong>
+     * for us, as NBT data frequently holds UUID stored using two longs of a similar
+     * size of the example below.</p>
+     *
+     * <p>We had to re-implement this to ensure the generated structure to have the
+     * right data type (instead of all numbers being doubles) and precision.</p>
+     *
+     * @param json The json object to be decoded.
+     * @return {@link Map Map&lt;String, Object&gt;} representing the same structure
+     * (recursively) using native types.
+     *
+     * @see #jsonToNative(JsonElement) Converts any json element (including objects)
+     * to a native data structure.
+     */
+    private static Map<String, Object> jsonToNative(final JsonObject json)
+    {
+        final Map<String, Object> nativeMap = new HashMap<>();
+
+        json.entrySet().forEach(entry ->
+        {
+            final Object nativeValue = jsonToNative(entry.getValue());
+
+            if (nativeValue != null)
+            {
+                nativeMap.put(entry.getKey(), nativeValue);
+            }
+        });
+
+        return nativeMap;
+    }
+
+    /**
+     * From a JSON element, constructs a data structure representing
+     * the same structure (recursively) using native types.
+     *
+     * <p>We had to re-implement this to ensure the generated structure to have the
+     * right data type (instead of all numbers being doubles) and precision.</p>
+     *
+     * @param element The json element to be decoded.
+     * @return A native data structure (either a {@link Map Map&lt;String, Object&gt;},
+     * a {@link List List&lt;Object&gt;}, or a native type) representing the same
+     * structure (recursively).
+     *
+     * @see #jsonToNative(JsonObject) Converts a json object to an explicit {@link Map}.
+     * The JavaDoc also contains explainations on why this is needed.
+     */
+    private static Object jsonToNative(final JsonElement element)
+    {
+        if (element.isJsonObject())
+        {
+            return jsonToNative(element.getAsJsonObject());
+        }
+        else if (element.isJsonArray())
+        {
+            final List<Object> list = new ArrayList<>();
+
+            element.getAsJsonArray().forEach(listElement ->
+            {
+                final Object nativeValue = jsonToNative(listElement);
+
+                if (nativeValue != null)
+                {
+                    list.add(nativeValue);
+                }
+            });
+
+            return list;
+        }
+        else if (element.isJsonPrimitive())
+        {
+            final JsonPrimitive primitive = element.getAsJsonPrimitive();
+
+            if (primitive.isBoolean())
+            {
+                return primitive.getAsBoolean();
+            }
+            else if (primitive.isString())
+            {
+                return primitive.getAsString();
+            }
+            else /* it's a number… we yet have to find the type. */
+            {
+                final BigDecimal number = primitive.getAsBigDecimal();
+
+                try
+                {
+                    return number.byteValueExact();
+                }
+                catch (final ArithmeticException e1)
+                {
+                    try
+                    {
+                        return number.shortValueExact();
+                    }
+                    catch (final ArithmeticException e2)
+                    {
+                        try
+                        {
+                            return number.intValueExact();
+                        }
+                        catch (final ArithmeticException e3)
+                        {
+                            try
+                            {
+                                return number.longValueExact();
+                            }
+                            catch (final ArithmeticException e4)
+                            {
+                                try
+                                {
+                                    return number.doubleValue();
+                                }
+                                catch (final ArithmeticException | NumberFormatException e5)
+                                {
+                                    return number;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // Else the element is null.
+        return null;
     }
 }
