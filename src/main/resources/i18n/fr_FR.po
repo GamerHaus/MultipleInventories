@@ -1,0 +1,157 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2018-01-30 14:46+0100\n"
+"PO-Revision-Date: 2018-01-30 14:47+0100\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 2.0.6\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: src/main/java/fr/zcraft/MultipleInventories/importers/ImportProcess.java:103
+msgid ""
+"{ce}The {0} importer cannot run, probably due to a dependency missing. "
+"Aborting."
+msgstr ""
+"{ce}L'importateur {0} ne peut pas tourner, probablement à cause d'une "
+"dépendance manquante. L'importation est annulée."
+
+#: src/main/java/fr/zcraft/MultipleInventories/importers/ImportProcess.java:111
+msgid "{ce}Maintenance started, please come back later."
+msgstr "{ce}Maintenance démarrée, veuillez revenir plus tard."
+
+#. / ETA displayed in the kick message when a player tries to login during a migration.
+#: src/main/java/fr/zcraft/MultipleInventories/importers/ImportProcess.java:111
+#: src/main/java/fr/zcraft/MultipleInventories/importers/ImportProcess.java:260
+msgid "{gray}ETA: {0}"
+msgstr "{gray}Temps restant estimé : {0}"
+
+#: src/main/java/fr/zcraft/MultipleInventories/importers/ImportProcess.java:125
+msgid ""
+"{cs}Starting import, processing {0} player every {1} ticks, {2} players "
+"total."
+msgid_plural ""
+"{cs}Starting import, processing {0} players every {1} ticks, {2} players "
+"total."
+msgstr[0] ""
+"{cs}Importation démarrée ; un joueur est traité tous les {1} ticks, avec un "
+"total de {2} joueurs."
+msgstr[1] ""
+"{cs}Importation démarrée ; {0} joueurs sont traités tous les {1} ticks, avec "
+"un total de {2} joueurs."
+
+#: src/main/java/fr/zcraft/MultipleInventories/importers/ImportProcess.java:132
+msgid "Groups found by the importer:"
+msgstr "Groupes trouvés par l'outil d'importation :"
+
+#: src/main/java/fr/zcraft/MultipleInventories/importers/ImportProcess.java:134
+#, java-format
+msgid "- {0}, with world: {1}"
+msgid_plural "- {0}, with worlds: {1}"
+msgstr[0] "- {0}, contenant le monde {1}"
+msgstr[1] "- {0}, contenant les mondes {1}"
+
+#: src/main/java/fr/zcraft/MultipleInventories/importers/ImportProcess.java:145
+msgid "{cs}Import complete."
+msgstr "{cs}Importation terminée."
+
+#: src/main/java/fr/zcraft/MultipleInventories/importers/ImportProcess.java:185
+msgid "currently unknown"
+msgstr "indéterminé pour le moment"
+
+#: src/main/java/fr/zcraft/MultipleInventories/importers/ImportProcess.java:234
+#, java-format
+msgid "Importing snapshots from {0}: {1}%... ({2} / {3}) - ETA {4}"
+msgstr ""
+"Importation des instantanés d'inventaire depuis {0} : {1}%... ({2} / {3}) – "
+"ETA {4}"
+
+#: src/main/java/fr/zcraft/MultipleInventories/importers/ImportProcess.java:256
+msgid "{ce}Maintenance in progress, please come back later."
+msgstr "{ce}Maintenance en cours, veuillez revenir plus tard."
+
+#. / Completion displayed in the kick message when a player tries to login during a migration.
+#: src/main/java/fr/zcraft/MultipleInventories/importers/ImportProcess.java:258
+msgid "{gray}{0}% completed ({1} / {2})"
+msgstr "{gray}{0}% migré ({1} / {2})"
+
+#: src/main/java/fr/zcraft/MultipleInventories/commands/mi/MiImportCommand.java:23
+msgid "{gold}{bold}This importer will import data from MultiInv."
+msgstr "{gold}{bold}Cet outil va importer les données depuis MultiInv."
+
+#: src/main/java/fr/zcraft/MultipleInventories/commands/mi/MiImportCommand.java:24
+msgid ""
+"{red}{bold}IMPORTANT.{red} Before processing, please check that you "
+"configured this plugin (MultipleInventories) like MultiInv, with the same "
+"groups names exactly (this importer will NOT copy the configuration and will "
+"use the MultiInv groups to import data)."
+msgstr ""
+"{red}{bold}IMPORTANT.{red} Avant de commencer, veuillez vérifier que vous "
+"avez configuré ce plugin (MultipleInventories) de la même façon que "
+"MultiInv, avec les mêmes noms de groupes exactement. Cet outil d'importation "
+"ne va PAS copier la configuration, et va utiliser les groupes de MultiInv "
+"pour importer les inventaires."
+
+#: src/main/java/fr/zcraft/MultipleInventories/commands/mi/MiImportCommand.java:25
+msgid ""
+"At the beginning of the process, all players (including you!) will be "
+"kicked, and the server will be force-whitelisted during this import."
+msgstr ""
+"Au début du processus, tous les joueurs (vous inclut !) seront expulsés, et "
+"le serveur sera placé en liste blanche durant l'importation."
+
+#: src/main/java/fr/zcraft/MultipleInventories/commands/mi/MiImportCommand.java:26
+msgid ""
+"When the import will be completed, remove MultiInv, as having both "
+"MultipleInventories and MultiInv will cause conflicts."
+msgstr ""
+"Quand l'importation sera achevée, retirez MultiInv - avoir "
+"MultipleInventories et MultiInv simultanément causera des conflits."
+
+#: src/main/java/fr/zcraft/MultipleInventories/commands/mi/MiImportCommand.java:28
+msgid ""
+"Please also note that this importer will only read the MultiInv data, but "
+"never write anything on the MultiInv side."
+msgstr ""
+"Veuillez également noter que cet outil d'importation ne va que lire les "
+"données de MultiInv, sans jamais écrire quoique ce soit dans les fichiers de "
+"MultiInv."
+
+#: src/main/java/fr/zcraft/MultipleInventories/commands/mi/MiImportCommand.java:31
+msgid "If you are ready, execute {cc}{0}{reset}."
+msgstr "Si vous êtes prêt⋅e, exécutez {cc}{0}{reset}."
+
+#: src/main/java/fr/zcraft/MultipleInventories/commands/mi/MiImportCommand.java:32
+msgid ""
+"Click here to execute\n"
+"{cc}{0}"
+msgstr ""
+"Cliquez ici pour exécuter\n"
+"{cc}{0}"
+
+#: src/main/java/fr/zcraft/MultipleInventories/commands/mi/MiListCommand.java:28
+msgid "World groups"
+msgstr "Groupes de mondes"
+
+#. / Separator between group name and worlds list in /mi list
+#: src/main/java/fr/zcraft/MultipleInventories/commands/mi/MiListCommand.java:43
+msgid ": "
+msgstr " : "
+
+#: src/main/java/fr/zcraft/MultipleInventories/commands/mi/MiListCommand.java:54
+msgid "Per-gamemode inventories are {green}enabled{gray}."
+msgstr "Les inventaires séparés par mode de jeu sont {green}activés{gray}."
+
+#: src/main/java/fr/zcraft/MultipleInventories/commands/mi/MiListCommand.java:58
+msgid "Per-gamemode inventories are {red}disabled{gray}."
+msgstr "Les inventaires séparés par mode de jeu sont {red}désactivés{gray}."
