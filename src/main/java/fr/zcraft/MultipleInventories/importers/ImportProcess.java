@@ -216,7 +216,7 @@ public class ImportProcess
                     return;
                 }
 
-                long t = System.currentTimeMillis();
+                final long t = System.currentTimeMillis();
 
                 for (final String group : worldGroups.keySet())
                 {
@@ -233,14 +233,17 @@ public class ImportProcess
 
                 meanExecutionTimePerPlayer = (executionTime + (amountProcessed - 1) * meanExecutionTimePerPlayer) / amountProcessed;
 
-                // …and the percentage, to be displayed when it changes.
-                final int percentage = (int) Math.floor((((double) (playersCountToProcess - importQueue.size())) / ((double) playersCountToProcess)) * 100);
-                if (percentage != lastPercentage)
+                // …and the percentage, to be displayed when it changes of a few cycles after the beginning,
+                // when the ETA is more reliable.
+                final int processed = playersCountToProcess - importQueue.size();
+                final int percentage = (int) Math.floor((((double) (processed)) / ((double) playersCountToProcess)) * 100);
+
+                if (percentage != lastPercentage || processed == 3 * PLAYERS_PER_TICK)
                 {
                     PluginLogger.info(
                             I.t(
                                     "Importing snapshots from {0}: {1}%... ({2} / {3}) - ETA {4} ({5} ms per player)",
-                                    importerName, percentage, playersCountToProcess - importQueue.size(),
+                                    importerName, percentage, processed,
                                     playersCountToProcess, getHumanFriendlyETA(), meanExecutionTimePerPlayer
                             )
                     );
@@ -258,7 +261,6 @@ public class ImportProcess
         {
             if (running)
             {
-
                 ev.disallow(
                         AsyncPlayerPreLoginEvent.Result.KICK_OTHER,
                         "\n" + I.t("{ce}Maintenance in progress, please come back later.") + "\n\n" +

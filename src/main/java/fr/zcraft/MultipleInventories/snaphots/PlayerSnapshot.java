@@ -145,7 +145,9 @@ public class PlayerSnapshot
     {
         if (player == null) return null;
 
-        final ItemStackSnapshot[] snapArmor = Arrays.stream(player.getInventory().getArmorContents()).map(ItemStackSnapshot::snap).toArray(ItemStackSnapshot[]::new);
+        final ItemStackSnapshot[] snapArmor = Arrays.stream(player.getInventory().getArmorContents())
+                                                    .map(ItemStackSnapshot::snap)
+                                                    .toArray(ItemStackSnapshot[]::new);
 
         return new PlayerSnapshot(
                 player.getLevel(),

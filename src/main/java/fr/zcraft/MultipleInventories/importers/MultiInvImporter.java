@@ -60,7 +60,6 @@ public class MultiInvImporter implements Importer
     private MultiInv multiInv = null;
 
     private Map<String, Set<String>> groups = null;
-    private Map<String, String> reversedGroups = null;
 
     public MultiInvImporter()
     {
@@ -92,7 +91,8 @@ public class MultiInvImporter implements Importer
     }
 
     @Override
-    public void onEnd() {
+    public void onEnd()
+    {
         PluginLogger.info(I.t("The migration finished! Now, please remove MultiInv and reboot the server. Then, the players will be able to connect again, and the whole process will be done."));
     }
 
@@ -101,7 +101,7 @@ public class MultiInvImporter implements Importer
     {
         if (groups != null) return groups;
 
-        reversedGroups = multiInv.getAPI().getGroups();
+        final Map<String, String> reversedGroups = multiInv.getAPI().getGroups();
         final Map<String, Set<String>> groups = new HashMap<>();
 
         for (final Map.Entry<String, String> group : reversedGroups.entrySet())
@@ -116,7 +116,7 @@ public class MultiInvImporter implements Importer
     }
 
     @Override
-    public PlayerSnapshot importSnapshot(OfflinePlayer player, String group, GameMode mode)
+    public PlayerSnapshot importSnapshot(final OfflinePlayer player, final String group, final GameMode mode)
     {
         final Set<String> worldsInGroup = groups.get(group);
         if (worldsInGroup == null || worldsInGroup.isEmpty()) return null;
@@ -142,6 +142,7 @@ public class MultiInvImporter implements Importer
             hasArmor = !isInventoryEmpty(inventory.getArmorContents());
             hasEffects = !inventory.getPotions().isEmpty();
         }
+
         if (enderChest != null)
         {
             hasEnderChest = !isInventoryEmpty(enderChest.getInventoryContents());
@@ -184,7 +185,7 @@ public class MultiInvImporter implements Importer
             }
             catch (NoSuchFieldException | IllegalAccessException e)
             {
-                PluginLogger.error("Error while retrieving item type from MIItemStack");
+                PluginLogger.error("Error while retrieving item type from MIItemStack", e);
             }
         }
 
