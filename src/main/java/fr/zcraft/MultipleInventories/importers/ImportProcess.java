@@ -250,6 +250,8 @@ public class ImportProcess
 
                     lastPercentage = percentage;
                 }
+
+                MinecraftCleaner.cleanup();
             }
         }
     }
