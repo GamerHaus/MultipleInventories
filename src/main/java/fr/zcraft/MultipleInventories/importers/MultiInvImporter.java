@@ -121,13 +121,26 @@ public class MultiInvImporter implements Importer
         final Set<String> worldsInGroup = groups.get(group);
         if (worldsInGroup == null || worldsInGroup.isEmpty()) return null;
 
-        final MIAPIPlayer miSnapshot = multiInv.getAPI().getPlayerInstance(player, worldsInGroup.iterator().next(), mode);
-        if (miSnapshot == null) return null;
+        final MIAPIPlayer miSnapshot;
+        try
+        {
+            miSnapshot = multiInv.getAPI().getPlayerInstance(player, worldsInGroup.iterator().next(), mode);
+            if (miSnapshot == null) return null;
+        }
+        catch (IllegalArgumentException e)
+        {
+            // If the player's name in the OfflinePlayer object is null, the MultiInvAPI
+            // may throw an IllegalArgumentException. This can happens with very old servers
+            // still having old players files in their playerdata folder.
+            PluginLogger.error("Unable to import data for player “{0}” (UUID: {1}).", player.getName(), player.getUniqueId());
+            return null;
+        }
 
         final MIInventory inventory = miSnapshot.getInventory();
         final MIEnderchestInventory enderChest = miSnapshot.getEnderchest();
 
-        // We check if it's a snapshot with no data, as MultiInv will return an object frequently even without anything in it
+        // We check if it's a snapshot with no data, as MultiInv will return an object frequently even without anything in it.
+        // The data then looks like this:
         // {"level":0,"exp":0.0,"expTotal":-1,"foodLevel":20,"exhaustion":0.0,"saturation":5.0,"health":20.0,"maxHealth":20.0,
         // "armor":[null,null,null,null],"inventory":{},"enderChest":{},"effects":[]}
 
