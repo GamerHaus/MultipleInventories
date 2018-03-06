@@ -31,16 +31,19 @@
  */
 package fr.zcraft.MultipleInventories.players;
 
+import fr.zcraft.MultipleInventories.MultipleInventories;
 import fr.zcraft.MultipleInventories.snaphots.PlayerSnapshot;
 import fr.zcraft.MultipleInventories.snaphots.SnapshotsIO;
 import fr.zcraft.zlib.components.worker.WorkerCallback;
 import fr.zcraft.zlib.tools.PluginLogger;
+import fr.zcraft.zlib.tools.runners.RunTask;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.util.Map;
 import java.util.UUID;
@@ -68,6 +71,14 @@ public class PlayerSnapshotsStore
      * gamemode change to duplicate stuff.
      */
     private boolean changesBeingApplied = false;
+
+    /**
+     * Stores the planned update if there is one, to avoid multiple updates
+     * walking on each other, like when a gamemode and world are changed in
+     * the same tick, or when the gamemode or world is changed many times
+     * in a single tick.
+     */
+    private BukkitTask nextTickUpdateTask = null;
 
 
     public PlayerSnapshotsStore(OfflinePlayer player)
@@ -149,6 +160,8 @@ public class PlayerSnapshotsStore
      * no-one is found, the player state is reinitialized, like on a first
      * connection.
      *
+     * If the player is logged out, does nothing.
+     *
      * @param group    The worlds group.
      * @param gamemode The gamemode.
      */
@@ -183,6 +196,41 @@ public class PlayerSnapshotsStore
 
             player.getInventory().setHeldItemSlot(0);
         }
+    }
+
+    /**
+     * Applies the snapshot according to the current state of the player, i.e.
+     * its current gamemode and the group its world is in. If no corresponding
+     * snapshot can be found, the player state is reinitialized, like on a first
+     * connection.
+     *
+     * If the player is logged out, does nothing.
+     */
+    public void applySnapshotFromState()
+    {
+        final Player player = Bukkit.getPlayer(playerID);
+        if (player == null || !player.isOnline()) return;
+
+        applySnapshot(MultipleInventories.get().getPlayersManager().getGroupForWorld(player.getWorld()), player.getGameMode());
+    }
+
+    /**
+     * Queues for the next tick a snapshot update, according to the then-current player
+     * state (i.e. its current gamemode and the group its world is in). If called multiple
+     * times in one single tick, this will trigger only one update on the next tick.
+     */
+    public void applySnapshotFromStateNextTick()
+    {
+        // Already scheduled
+        if (nextTickUpdateTask != null) return;
+
+        nextTickUpdateTask = RunTask.nextTick(() -> {
+            setChangesBeingApplied(true);
+            applySnapshotFromState();
+            setChangesBeingApplied(false);
+
+            nextTickUpdateTask = null;
+        });
     }
 
     /**

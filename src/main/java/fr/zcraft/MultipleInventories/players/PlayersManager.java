@@ -249,13 +249,8 @@ public class PlayersManager extends ZLibComponent implements Listener
         // In very rare cases (especially with Essentials), the gamemode can be null.
         final GameMode gamemode = player.getGameMode() != null && Config.PER_GAMEMODE_INVENTORIES.get() ? player.getGameMode() : GameMode.SURVIVAL;
 
-        store.setChangesBeingApplied(true);
         store.saveSnapshot(oldGroup, gamemode, PlayerSnapshot.snap(player, isRespawn));
-
-        RunTask.nextTick(() ->{
-            store.applySnapshot(newGroup, gamemode);
-            store.setChangesBeingApplied(false);
-        });
+        store.applySnapshotFromStateNextTick();
 
         return true;
     }
@@ -281,13 +276,8 @@ public class PlayersManager extends ZLibComponent implements Listener
 
         final String group = getGroupForWorld(player.getWorld());
 
-        store.setChangesBeingApplied(true);
         store.saveSnapshot(group, oldGameMode, PlayerSnapshot.snap(player));
-
-        RunTask.nextTick(() -> {
-            store.applySnapshot(group, newGameMode);
-            store.setChangesBeingApplied(false);
-        });
+        store.applySnapshotFromStateNextTick();
 
         return true;
     }
