@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import fr.zcraft.MultipleInventories.commands.mi.MiImportCommand;
 import fr.zcraft.MultipleInventories.commands.mi.MiListCommand;
-import fr.zcraft.MultipleInventories.commands.mi.MiNBTDebugCommand;
 import fr.zcraft.MultipleInventories.commands.mi.MiReloadCommand;
 import fr.zcraft.MultipleInventories.players.PlayersManager;
 import fr.zcraft.MultipleInventories.snaphots.SnapshotsIO;
@@ -36,7 +35,7 @@ public final class MultipleInventories extends ZPlugin implements Listener
         playersManager = loadComponent(PlayersManager.class);
 
         // noinspection unchecked
-        Commands.register("mi", MiListCommand.class, MiReloadCommand.class, MiImportCommand.class, MiNBTDebugCommand.class);
+        Commands.register("mi", MiListCommand.class, MiReloadCommand.class, MiImportCommand.class);
     }
 
     public static MultipleInventories get()

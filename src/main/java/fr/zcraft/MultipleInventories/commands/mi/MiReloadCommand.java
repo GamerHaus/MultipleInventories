@@ -1,34 +1,23 @@
 package fr.zcraft.MultipleInventories.commands.mi;
 
+import fr.zcraft.MultipleInventories.Config;
+import fr.zcraft.MultipleInventories.MultipleInventories;
 import fr.zcraft.MultipleInventories.Permissions;
-import fr.zcraft.MultipleInventories.snaphots.PlayerSnapshot;
 import fr.zcraft.zlib.components.commands.Command;
-import fr.zcraft.zlib.components.commands.CommandException;
 import fr.zcraft.zlib.components.commands.CommandInfo;
-import fr.zcraft.zlib.tools.PluginLogger;
-import fr.zcraft.zlib.tools.runners.RunTask;
+import fr.zcraft.zlib.components.i18n.I;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-import org.bukkit.potion.PotionEffect;
 
 
 @CommandInfo (name = "reload")
 public final class MiReloadCommand extends Command
 {
     @Override
-    protected void run() throws CommandException
+    protected void run()
     {
-        final Player player = playerSender();
-        final PlayerSnapshot snapshot = PlayerSnapshot.snap(player);
-        final String jsonDump = snapshot.toJSONString();
-
-        PluginLogger.info(jsonDump);
-
-        player.getInventory().clear();
-        player.getEnderChest().clear();
-        player.getActivePotionEffects().stream().map(PotionEffect::getType).forEach(player::removePotionEffect);
-
-        RunTask.later(() -> PlayerSnapshot.fromJSONString(jsonDump).reconstruct(player), 20L);
+        Config.reload();
+        MultipleInventories.get().getPlayersManager().loadWorldsGroups();
+        success(I.t("{0} configuration reloaded.", MultipleInventories.get().getDescription().getName()));
     }
 
     @Override
