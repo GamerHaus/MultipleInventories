@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-01-30 14:46+0100\n"
-"PO-Revision-Date: 2018-01-30 14:47+0100\n"
+"POT-Creation-Date: 2018-03-06 17:48+0100\n"
+"PO-Revision-Date: 2018-03-06 17:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -18,7 +18,17 @@ msgstr ""
 "X-Generator: Poedit 2.0.6\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: src/main/java/fr/zcraft/MultipleInventories/importers/ImportProcess.java:103
+#: src/main/java/fr/zcraft/MultipleInventories/importers/MultiInvImporter.java:96
+msgid ""
+"The migration finished! Now, please remove MultiInv and reboot the server. "
+"Then, the players will be able to connect again, and the whole process will "
+"be done."
+msgstr ""
+"La migration est terminée ! Maintenant, veuillez retirer MultiInv et "
+"redémarrer le serveur. Après cela, les joueurs pourront à nouveau se "
+"connecter, et le processus sera complètement achevée."
+
+#: src/main/java/fr/zcraft/MultipleInventories/importers/ImportProcess.java:104
 msgid ""
 "{ce}The {0} importer cannot run, probably due to a dependency missing. "
 "Aborting."
@@ -26,17 +36,17 @@ msgstr ""
 "{ce}L'importateur {0} ne peut pas tourner, probablement à cause d'une "
 "dépendance manquante. L'importation est annulée."
 
-#: src/main/java/fr/zcraft/MultipleInventories/importers/ImportProcess.java:111
+#: src/main/java/fr/zcraft/MultipleInventories/importers/ImportProcess.java:112
 msgid "{ce}Maintenance started, please come back later."
 msgstr "{ce}Maintenance démarrée, veuillez revenir plus tard."
 
 #. / ETA displayed in the kick message when a player tries to login during a migration.
-#: src/main/java/fr/zcraft/MultipleInventories/importers/ImportProcess.java:111
-#: src/main/java/fr/zcraft/MultipleInventories/importers/ImportProcess.java:260
+#: src/main/java/fr/zcraft/MultipleInventories/importers/ImportProcess.java:112
+#: src/main/java/fr/zcraft/MultipleInventories/importers/ImportProcess.java:272
 msgid "{gray}ETA: {0}"
 msgstr "{gray}Temps restant estimé : {0}"
 
-#: src/main/java/fr/zcraft/MultipleInventories/importers/ImportProcess.java:125
+#: src/main/java/fr/zcraft/MultipleInventories/importers/ImportProcess.java:127
 msgid ""
 "{cs}Starting import, processing {0} player every {1} ticks, {2} players "
 "total."
@@ -50,40 +60,62 @@ msgstr[1] ""
 "{cs}Importation démarrée ; {0} joueurs sont traités tous les {1} ticks, avec "
 "un total de {2} joueurs."
 
-#: src/main/java/fr/zcraft/MultipleInventories/importers/ImportProcess.java:132
+#: src/main/java/fr/zcraft/MultipleInventories/importers/ImportProcess.java:134
 msgid "Groups found by the importer:"
 msgstr "Groupes trouvés par l'outil d'importation :"
 
-#: src/main/java/fr/zcraft/MultipleInventories/importers/ImportProcess.java:134
+#: src/main/java/fr/zcraft/MultipleInventories/importers/ImportProcess.java:136
 #, java-format
 msgid "- {0}, with world: {1}"
 msgid_plural "- {0}, with worlds: {1}"
 msgstr[0] "- {0}, contenant le monde {1}"
 msgstr[1] "- {0}, contenant les mondes {1}"
 
-#: src/main/java/fr/zcraft/MultipleInventories/importers/ImportProcess.java:145
+#: src/main/java/fr/zcraft/MultipleInventories/importers/ImportProcess.java:147
 msgid "{cs}Import complete."
 msgstr "{cs}Importation terminée."
 
-#: src/main/java/fr/zcraft/MultipleInventories/importers/ImportProcess.java:185
+#: src/main/java/fr/zcraft/MultipleInventories/importers/ImportProcess.java:192
 msgid "currently unknown"
 msgstr "indéterminé pour le moment"
 
-#: src/main/java/fr/zcraft/MultipleInventories/importers/ImportProcess.java:234
+#: src/main/java/fr/zcraft/MultipleInventories/importers/ImportProcess.java:245
 #, java-format
-msgid "Importing snapshots from {0}: {1}%... ({2} / {3}) - ETA {4}"
+msgid ""
+"Importing snapshots from {0}: {1}%... ({2} / {3}) - ETA {4} ({5} ms per "
+"player)"
 msgstr ""
-"Importation des instantanés d'inventaire depuis {0} : {1}%... ({2} / {3}) – "
-"ETA {4}"
+"Importation des instantanés d'inventaire depuis {0} : {1}%… ({2} / {3}) – "
+"ETA {4} ({5} ms par joueur)"
 
-#: src/main/java/fr/zcraft/MultipleInventories/importers/ImportProcess.java:256
+#: src/main/java/fr/zcraft/MultipleInventories/importers/ImportProcess.java:268
+#: src/main/java/fr/zcraft/MultipleInventories/importers/ImportProcess.java:279
 msgid "{ce}Maintenance in progress, please come back later."
 msgstr "{ce}Maintenance en cours, veuillez revenir plus tard."
 
 #. / Completion displayed in the kick message when a player tries to login during a migration.
-#: src/main/java/fr/zcraft/MultipleInventories/importers/ImportProcess.java:258
+#: src/main/java/fr/zcraft/MultipleInventories/importers/ImportProcess.java:270
 msgid "{gray}{0}% completed ({1} / {2})"
 msgstr "{gray}{0}% migré ({1} / {2})"
+
+#. / Message displayed to the player when the migration is finished and the admin is needed to reboot
+#: src/main/java/fr/zcraft/MultipleInventories/importers/ImportProcess.java:281
+msgid ""
+"{gray}The migration completed; we still need an admin to finish the "
+"migration by hand and reboot the server."
+msgstr ""
+"{gray}La migration est terminée ; il faut toujours attendre un "
+"administrateur pour finir à la main et redémarrer le serveur."
+
+#. / Message displayed to the player when the migration is finished and the admin is needed to reboot
+#: src/main/java/fr/zcraft/MultipleInventories/importers/ImportProcess.java:283
+msgid "{gray}If you are the admin, check out the console."
+msgstr "{gray}Si vous êtes un administrateur, allez voir la console."
+
+#: src/main/java/fr/zcraft/MultipleInventories/commands/mi/MiReloadCommand.java:20
+#, java-format
+msgid "{0} configuration reloaded."
+msgstr "La configuration de {0} a été rechargée avec succès."
 
 #: src/main/java/fr/zcraft/MultipleInventories/commands/mi/MiImportCommand.java:23
 msgid "{gold}{bold}This importer will import data from MultiInv."
