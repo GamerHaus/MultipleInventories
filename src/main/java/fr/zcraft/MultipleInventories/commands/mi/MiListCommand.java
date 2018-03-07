@@ -10,9 +10,11 @@ import fr.zcraft.zlib.components.rawtext.RawText;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 
 @CommandInfo (name = "list")
@@ -21,7 +23,20 @@ public final class MiListCommand extends Command
     @Override
     protected void run()
     {
-        final Map<String, Set<String>> groups = MultipleInventories.get().getPlayersManager().getWorldsGroups();
+        final Map<String, Set<String>> groups = new TreeMap<>((s1, s2) ->
+        {
+            if (s1.equals(s2))
+                return 0;
+            else if (s1.equals("default"))
+                return 1;
+            else if (s2.equals("default"))
+                return -1;
+            else return s1.compareTo(s2);
+        });
+
+        groups.putAll(MultipleInventories.get().getPlayersManager().getWorldsGroups());
+
+        if (sender instanceof Player) info("");
 
         send(
                 new RawText("")
@@ -42,7 +57,7 @@ public final class MiListCommand extends Command
                  /// Separator between group name and worlds list in /mi list
                 .then(I.t(": "))
                     .color(ChatColor.GRAY)
-                .then(StringUtils.join(entry.getValue(), ", "))
+                .then(StringUtils.join(entry.getValue(), ChatColor.GRAY + ", " + ChatColor.RESET))
                     .color(ChatColor.WHITE)
                 .build())
             .forEach(this::send);
