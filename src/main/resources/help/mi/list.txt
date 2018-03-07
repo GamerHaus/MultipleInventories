@@ -1,0 +1,4 @@
+Lists the worlds group and displays an overview of
+the configuration.
+You may want to check out §6/mi reload§r to hot-reload
+this configuration without server restart.

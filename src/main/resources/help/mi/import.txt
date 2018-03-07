@@ -1,0 +1,18 @@
+This command imports data from another inventory-
+management plugin.
+
+Currently, only MultiInv is supported, but other plugins
+could be added by request (open an issue on GitHub).
+
+The migration can be very long, depending on how many
+unique player you have on your server. For 20k players,
+three to four hours were needed.
+
+While importing, the players will be locked out of the
+server, as online players may interfere with the process.
+They will be able to check out the migration progress and
+ETA by trying to login onto the server: the kick message
+will display these data.
+
+You'll be ask to confirm your choice before the migration
+starts, except if you append §6--confirm§r to the command.

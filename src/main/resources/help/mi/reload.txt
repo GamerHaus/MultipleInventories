@@ -1,0 +1,36 @@
+Hot-reloads the configuration from the disk, and applies
+it immediately without server reload or restart.
+
+§9§lNew worlds on the server
+
+When you create a world on the server, as example using
+MultiWorld, it is automatically added to the §odefault§r
+group without further action. You only need to run this
+command if you want it to be on another group, after you
+updated the configuration file to match.
+
+§9§lAbout existing players on configuration change
+
+Please note that if you change the worlds group or the
+inventories-per-gamemode option, the plugin will use the
+current inventories of the players for their current
+world and gamemode.
+
+As example, let's say that you had two worlds, §7world_1§r
+and §7world_2§r, on the same group, with players on both
+worlds, and you change the configuration to have them on
+distinct groups; the players on the §7world_2§r will have
+their current inventory for this world and an empty one for
+§7world_1§r, and §ovice-versa§r for the players in the
+§7world_1§r. To avoid that, ensure that all players are
+in the correct world before reloading the configuration.
+
+The same applies if you change the inventories-per-gamemode
+option.
+
+§9§lConfiguration update from the game
+
+A command to update the world groups from in-game without
+updating manually the configuration file is currently not
+available and not planned. Open an issue on GitHub if you
+need such a feature.

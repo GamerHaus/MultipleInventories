@@ -11,7 +11,7 @@ import fr.zcraft.zlib.components.rawtext.RawText;
 import org.bukkit.command.CommandSender;
 
 
-@CommandInfo (name = "import")
+@CommandInfo (name = "import", usageParameters = "[--confirm]")
 @WithFlags({"confirm"})
 public final class MiImportCommand extends Command
 {

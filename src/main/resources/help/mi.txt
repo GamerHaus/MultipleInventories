@@ -1,0 +1,6 @@
+§6§lHere are the commands for MultipleInventory.
+§rThis plugin works mainly alone without intervention, automatically when players switch their world or gamemode. These few commands are for maintenance only.
+list:Lists the worlds group and displays an overview of the configuration.
+reload:If you changed the configuration, this hot-reloads it without restarting the server.
+import:Imports inventory data from another plugin.
+help:Displays this help.
