@@ -114,6 +114,11 @@ public class PlayersManager extends ZLibComponent implements Listener
     {
         if (!reversedWorldGroups.containsKey(world.getName()))
         {
+            if (!worldsGroups.containsKey(DEFAULT_WORLD_GROUP))
+            {
+                worldsGroups.put(DEFAULT_WORLD_GROUP, new HashSet<>());
+            }
+
             worldsGroups.get(DEFAULT_WORLD_GROUP).add(world.getName());
             reversedWorldGroups.put(world.getName(), DEFAULT_WORLD_GROUP);
         }
