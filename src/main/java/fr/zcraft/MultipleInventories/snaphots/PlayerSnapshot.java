@@ -345,23 +345,24 @@ public class PlayerSnapshot
         for (int i = 0; i < jsonArmor.size(); i++)
         {
             final JsonElement armorItem = jsonArmor.get(i);
-            armor[i] = !armorItem.isJsonNull() ? ItemStackSnapshot.fromJSON(armorItem.getAsJsonObject()) : null;
+            armor[i] = armorItem.isJsonObject() ? ItemStackSnapshot.fromJSON(armorItem.getAsJsonObject()) : null;
         }
 
-        final JsonArray jsonEffects = json.getAsJsonArray("effects");
+        final JsonArray jsonEffects = json.get("effects").isJsonArray() ? json.getAsJsonArray("effects") : new JsonArray();
         final List<PotionEffect> effects = Streams.stream(jsonEffects)
+                                                  .filter(jsonEffect -> jsonEffect != null && jsonEffect.isJsonObject())
                                                   .map(jsonEffect -> potionEffectFromJSON(jsonEffect.getAsJsonObject()))
                                                   .collect(Collectors.toList());
 
         return new PlayerSnapshot(
-                json.getAsJsonPrimitive("level").getAsInt(),
-                json.getAsJsonPrimitive("exp").getAsFloat(),
-                json.getAsJsonPrimitive("expTotal").getAsInt(),
-                json.getAsJsonPrimitive("foodLevel").getAsInt(),
-                json.getAsJsonPrimitive("exhaustion").getAsFloat(),
-                json.getAsJsonPrimitive("saturation").getAsFloat(),
-                json.getAsJsonPrimitive("health").getAsDouble(),
-                json.getAsJsonPrimitive("maxHealth").getAsDouble(),
+                isNull(json, "level")      ? 0    : json.getAsJsonPrimitive("level").getAsInt(),
+                isNull(json, "exp")        ? 0.0f : json.getAsJsonPrimitive("exp").getAsFloat(),
+                isNull(json, "expTotal")   ? 0    : json.getAsJsonPrimitive("expTotal").getAsInt(),
+                isNull(json, "foodLevel")  ? 20   : json.getAsJsonPrimitive("foodLevel").getAsInt(),
+                isNull(json, "exhaustion") ? 0f   : json.getAsJsonPrimitive("exhaustion").getAsFloat(),
+                isNull(json, "saturation") ? 5f   : json.getAsJsonPrimitive("saturation").getAsFloat(),
+                isNull(json, "health")     ? 20.0 : json.getAsJsonPrimitive("health").getAsDouble(),
+                isNull(json, "maxHealth")  ? 20.0 : json.getAsJsonPrimitive("maxHealth").getAsDouble(),
                 inventoryFromJSON(json.getAsJsonObject("inventory")),
                 inventoryFromJSON(json.getAsJsonObject("enderChest")),
                 armor,
@@ -382,6 +383,8 @@ public class PlayerSnapshot
 
         json.entrySet().forEach(jsonItemEntry ->
         {
+            if (!jsonItemEntry.getValue().isJsonObject()) return;
+
             try
             {
                 snapshot.put(Integer.parseInt(jsonItemEntry.getKey()), ItemStackSnapshot.fromJSON(jsonItemEntry.getValue().getAsJsonObject()));
@@ -401,11 +404,17 @@ public class PlayerSnapshot
 
         return new PotionEffect(
                 PotionEffectType.getByName(json.getAsJsonPrimitive("type").getAsString()),
-                json.getAsJsonPrimitive("duration").getAsInt(),
-                json.getAsJsonPrimitive("amplifier").getAsInt(),
-                json.getAsJsonPrimitive("ambient").getAsBoolean(),
-                json.getAsJsonPrimitive("has-particles").getAsBoolean(),
+                isNull(json, "duration") ? 1 : json.getAsJsonPrimitive("duration").getAsInt(),
+                isNull(json, "amplifier") ? 1 : json.getAsJsonPrimitive("amplifier").getAsInt(),
+                !isNull(json, "ambient") && json.getAsJsonPrimitive("ambient").getAsBoolean(),
+                isNull(json, "has-particles") || json.getAsJsonPrimitive("has-particles").getAsBoolean(),
                 color != null && !color.isJsonNull() ? Color.fromRGB(color.getAsInt()) : null
         );
+    }
+
+    private static boolean isNull(final JsonObject element, final String child)
+    {
+        final JsonElement childElement = element.get(child);
+        return childElement == null || childElement.isJsonNull();
     }
 }

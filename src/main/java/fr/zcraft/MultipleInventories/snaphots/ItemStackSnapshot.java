@@ -203,12 +203,20 @@ public class ItemStackSnapshot
     @SuppressWarnings ("unchecked")
     public static ItemStackSnapshot fromJSON(final JsonObject json)
     {
-        return new ItemStackSnapshot(
-                Material.getMaterial(json.getAsJsonPrimitive("id").getAsString()),
-                json.getAsJsonPrimitive("Damage").getAsShort(),
-                json.getAsJsonPrimitive("Count").getAsInt(),
-                jsonToNative(json.getAsJsonObject("NBT"))
-        );
+        try
+        {
+            return new ItemStackSnapshot(
+                    Material.getMaterial(json.getAsJsonPrimitive("id").getAsString()),
+                    json.getAsJsonPrimitive("Damage").getAsShort(),
+                    json.getAsJsonPrimitive("Count").getAsInt(),
+                    jsonToNative(json.getAsJsonObject("NBT"))
+            );
+        }
+        catch (IllegalStateException e)
+        {
+            PluginLogger.error("Unable to load malformed item stack snapshot: {0}", e, json.toString());
+            return null;
+        }
     }
 
     /**
