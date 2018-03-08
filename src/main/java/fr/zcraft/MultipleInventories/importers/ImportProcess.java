@@ -218,13 +218,35 @@ public class ImportProcess
 
                 final long t = System.currentTimeMillis();
 
-                for (final String group : worldGroups.keySet())
+                try
                 {
-                    for (final GameMode mode : GameMode.values())
+                    for (final String group : worldGroups.keySet())
                     {
-                        final PlayerSnapshot snapshot = importer.importSnapshot(player, group, mode);
-                        if (snapshot != null)  SnapshotsIO.saveSnapshot(player.getUniqueId(), group, mode, snapshot);
+                        for (final GameMode mode : GameMode.values())
+                        {
+                            try
+                            {
+                                final PlayerSnapshot snapshot = importer.importSnapshot(player, group, mode);
+                                if (snapshot != null)
+                                {
+                                    SnapshotsIO.saveSnapshot(player.getUniqueId(), group, mode, snapshot);
+                                }
+                            }
+                            catch (final Exception e)
+                            {
+                                PluginLogger.error(
+                                        "Unable to import data for player {0} ({1}), group {2} and gamemode {3}. Skipping…", e,
+                                        player.getName(), player.getUniqueId(), group, mode
+                                );
+                            }
+                        }
                     }
+
+                    MinecraftCleaner.cleanup();
+                }
+                catch (final Exception e)
+                {
+                    PluginLogger.error("Unable to import data for player {0} ({1}). Skipping…", e, player.getName(), player.getUniqueId());
                 }
 
                 // Calculates the cumulative moving average so we can estimate the time left
@@ -250,8 +272,6 @@ public class ImportProcess
 
                     lastPercentage = percentage;
                 }
-
-                MinecraftCleaner.cleanup();
             }
         }
     }
