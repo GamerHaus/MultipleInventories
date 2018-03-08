@@ -397,7 +397,7 @@ public class PlayerSnapshot
 
     private static PotionEffect potionEffectFromJSON(final JsonObject json)
     {
-        final JsonPrimitive color = json.getAsJsonPrimitive("color");
+        final JsonPrimitive color = json.get("color").isJsonNull() ? null : json.getAsJsonPrimitive("color");
 
         return new PotionEffect(
                 PotionEffectType.getByName(json.getAsJsonPrimitive("type").getAsString()),
