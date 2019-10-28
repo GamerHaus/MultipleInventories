@@ -1,6 +1,7 @@
 name: MultipleInventories
 version: 1.0.2
 main: fr.zcraft.MultipleInventories.MultipleInventories
+api-version: "1.13"
 
 description: Multiple inventories actually working (and NBT aware)
 author: Amaury Carrade
