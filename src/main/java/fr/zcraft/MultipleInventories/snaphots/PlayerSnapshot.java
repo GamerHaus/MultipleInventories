@@ -40,6 +40,7 @@ import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
 import fr.zcraft.MultipleInventories.MultipleInventories;
 import fr.zcraft.zlib.tools.PluginLogger;
+import fr.zcraft.zlib.tools.reflection.Reflection;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -48,6 +49,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -302,7 +304,20 @@ public class PlayerSnapshot
         dump.addProperty("amplifier", effect.getAmplifier());
         dump.addProperty("ambient", effect.isAmbient());
         dump.addProperty("has-particles", effect.hasParticles());
-        dump.addProperty("color", effect.getColor() != null ? effect.getColor().asRGB() : null);
+
+        // WARN: getColor is deprecated in 1.14+; kept here for compatibility only.
+        // Always null in 1.14+.
+        if (effect.getColor() != null)
+        {
+            dump.addProperty("color", effect.getColor().asRGB());
+        }
+
+        // Only exists in 1.14+ but we want this to work in 1.9+.
+        try
+        {
+            dump.addProperty("has-icon", (boolean) Reflection.call(effect, "hasIcon"));
+        }
+        catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException ignored) { }
 
         return dump;
     }
@@ -400,16 +415,45 @@ public class PlayerSnapshot
 
     private static PotionEffect potionEffectFromJSON(final JsonObject json)
     {
-        final JsonPrimitive color = json.get("color").isJsonNull() ? null : json.getAsJsonPrimitive("color");
+        final JsonPrimitive color = (!json.has("color") || json.get("color").isJsonNull()) ? null : json.getAsJsonPrimitive("color");
 
-        return new PotionEffect(
-                PotionEffectType.getByName(json.getAsJsonPrimitive("type").getAsString()),
-                isNull(json, "duration") ? 1 : json.getAsJsonPrimitive("duration").getAsInt(),
-                isNull(json, "amplifier") ? 1 : json.getAsJsonPrimitive("amplifier").getAsInt(),
-                !isNull(json, "ambient") && json.getAsJsonPrimitive("ambient").getAsBoolean(),
-                isNull(json, "has-particles") || json.getAsJsonPrimitive("has-particles").getAsBoolean(),
-                color != null && !color.isJsonNull() ? Color.fromRGB(color.getAsInt()) : null
-        );
+        try
+        {
+            return new PotionEffect(
+                    PotionEffectType.getByName(json.getAsJsonPrimitive("type").getAsString()),
+                    isNull(json, "duration") ? 1 : json.getAsJsonPrimitive("duration").getAsInt(),
+                    isNull(json, "amplifier") ? 1 : json.getAsJsonPrimitive("amplifier").getAsInt(),
+                    !isNull(json, "ambient") && json.getAsJsonPrimitive("ambient").getAsBoolean(),
+                    isNull(json, "has-particles") || json.getAsJsonPrimitive("has-particles").getAsBoolean(),
+                    color != null && !color.isJsonNull() ? Color.fromRGB(color.getAsInt()) : null
+            );
+        }
+        catch (NoSuchMethodError e)
+        {
+            // 1.13+: there is no longer a color, but there is a `has-icon` flag.
+            try
+            {
+                return Reflection.instantiate(PotionEffect.class,
+                        PotionEffectType.getByName(json.getAsJsonPrimitive("type").getAsString()),
+                        isNull(json, "duration") ? 1 : json.getAsJsonPrimitive("duration").getAsInt(),
+                        isNull(json, "amplifier") ? 1 : json.getAsJsonPrimitive("amplifier").getAsInt(),
+                        !isNull(json, "ambient") && json.getAsJsonPrimitive("ambient").getAsBoolean(),
+                        isNull(json, "has-particles") || json.getAsJsonPrimitive("has-particles").getAsBoolean(),
+                        isNull(json, "has-icon") || json.getAsJsonPrimitive("has-icon").getAsBoolean()
+                );
+            }
+            catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException ex)
+            {
+                // THis one should always work
+                return new PotionEffect(
+                        PotionEffectType.getByName(json.getAsJsonPrimitive("type").getAsString()),
+                        isNull(json, "duration") ? 1 : json.getAsJsonPrimitive("duration").getAsInt(),
+                        isNull(json, "amplifier") ? 1 : json.getAsJsonPrimitive("amplifier").getAsInt(),
+                        !isNull(json, "ambient") && json.getAsJsonPrimitive("ambient").getAsBoolean(),
+                        isNull(json, "has-particles") || json.getAsJsonPrimitive("has-particles").getAsBoolean()
+                );
+            }
+        }
     }
 
     private static boolean isNull(final JsonObject element, final String child)
