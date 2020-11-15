@@ -33,8 +33,8 @@ package fr.zcraft.MultipleInventories.players;
 
 import fr.zcraft.MultipleInventories.Config;
 import fr.zcraft.MultipleInventories.snaphots.PlayerSnapshot;
-import fr.zcraft.zlib.core.ZLibComponent;
-import fr.zcraft.zlib.tools.runners.RunTask;
+import fr.zcraft.quartzlib.core.QuartzComponent;
+import fr.zcraft.quartzlib.tools.runners.RunTask;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.World;
@@ -42,23 +42,13 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
-import org.bukkit.event.player.PlayerGameModeChangeEvent;
-import org.bukkit.event.player.PlayerKickEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.event.player.PlayerRespawnEvent;
-import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.event.world.WorldLoadEvent;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 
-public class PlayersManager extends ZLibComponent implements Listener
+public class PlayersManager extends QuartzComponent implements Listener
 {
     private final static String DEFAULT_WORLD_GROUP = "default";
 

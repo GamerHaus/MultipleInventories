@@ -34,9 +34,9 @@ package fr.zcraft.MultipleInventories.players;
 import fr.zcraft.MultipleInventories.MultipleInventories;
 import fr.zcraft.MultipleInventories.snaphots.PlayerSnapshot;
 import fr.zcraft.MultipleInventories.snaphots.SnapshotsIO;
-import fr.zcraft.zlib.components.worker.WorkerCallback;
-import fr.zcraft.zlib.tools.PluginLogger;
-import fr.zcraft.zlib.tools.runners.RunTask;
+import fr.zcraft.quartzlib.components.worker.WorkerCallback;
+import fr.zcraft.quartzlib.tools.PluginLogger;
+import fr.zcraft.quartzlib.tools.runners.RunTask;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.OfflinePlayer;
@@ -55,8 +55,8 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class PlayerSnapshotsStore
 {
-    private UUID playerID;
-    private Map<String, Map<GameMode, PlayerSnapshot>> snapshots = new ConcurrentHashMap<>();
+    private final UUID playerID;
+    private final Map<String, Map<GameMode, PlayerSnapshot>> snapshots = new ConcurrentHashMap<>();
 
     /**
      * Updated when the player data is being loaded, when he just logged in.

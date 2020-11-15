@@ -33,9 +33,9 @@ package fr.zcraft.MultipleInventories.importers;
 
 import fr.zcraft.MultipleInventories.snaphots.ItemStackSnapshot;
 import fr.zcraft.MultipleInventories.snaphots.PlayerSnapshot;
-import fr.zcraft.zlib.components.i18n.I;
-import fr.zcraft.zlib.tools.PluginLogger;
-import fr.zcraft.zlib.tools.reflection.Reflection;
+import fr.zcraft.quartzlib.components.i18n.I;
+import fr.zcraft.quartzlib.tools.PluginLogger;
+import fr.zcraft.quartzlib.tools.reflection.Reflection;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;

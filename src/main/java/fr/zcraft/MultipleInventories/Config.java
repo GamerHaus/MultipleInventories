@@ -1,14 +1,14 @@
 package fr.zcraft.MultipleInventories;
 
-import fr.zcraft.zlib.components.configuration.Configuration;
-import fr.zcraft.zlib.components.configuration.ConfigurationItem;
-import fr.zcraft.zlib.components.configuration.ConfigurationMap;
+import fr.zcraft.quartzlib.components.configuration.Configuration;
+import fr.zcraft.quartzlib.components.configuration.ConfigurationItem;
+import fr.zcraft.quartzlib.components.configuration.ConfigurationMap;
 
 import java.util.List;
 import java.util.Locale;
 
-import static fr.zcraft.zlib.components.configuration.ConfigurationItem.item;
-import static fr.zcraft.zlib.components.configuration.ConfigurationItem.map;
+import static fr.zcraft.quartzlib.components.configuration.ConfigurationItem.item;
+import static fr.zcraft.quartzlib.components.configuration.ConfigurationItem.map;
 
 
 public class Config extends Configuration

@@ -33,10 +33,10 @@ package fr.zcraft.MultipleInventories.importers;
 
 import fr.zcraft.MultipleInventories.snaphots.PlayerSnapshot;
 import fr.zcraft.MultipleInventories.snaphots.SnapshotsIO;
-import fr.zcraft.zlib.components.i18n.I;
-import fr.zcraft.zlib.core.ZLib;
-import fr.zcraft.zlib.tools.PluginLogger;
-import fr.zcraft.zlib.tools.runners.RunTask;
+import fr.zcraft.quartzlib.components.i18n.I;
+import fr.zcraft.quartzlib.core.QuartzLib;
+import fr.zcraft.quartzlib.tools.PluginLogger;
+import fr.zcraft.quartzlib.tools.runners.RunTask;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -50,12 +50,7 @@ import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.time.LocalTime;
-import java.util.ArrayDeque;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Queue;
-import java.util.Set;
+import java.util.*;
 
 
 public class ImportProcess
@@ -106,7 +101,7 @@ public class ImportProcess
         }
 
         importListener = new ImportListener();
-        ZLib.registerEvents(importListener);
+        QuartzLib.registerEvents(importListener);
 
         Bukkit.getOnlinePlayers()
               .forEach(player -> player.kickPlayer(I.t("{ce}Maintenance started, please come back later.") + "\n\n" + I.t("{gray}ETA: {0}", getHumanFriendlyETA())));

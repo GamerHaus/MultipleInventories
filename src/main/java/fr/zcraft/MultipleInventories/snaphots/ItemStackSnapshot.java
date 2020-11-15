@@ -37,11 +37,11 @@ import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSyntaxException;
 import fr.zcraft.MultipleInventories.MultipleInventories;
-import fr.zcraft.zlib.components.nbt.NBT;
-import fr.zcraft.zlib.components.nbt.NBTCompound;
-import fr.zcraft.zlib.tools.PluginLogger;
-import fr.zcraft.zlib.tools.items.ItemStackBuilder;
-import fr.zcraft.zlib.tools.reflection.NMSException;
+import fr.zcraft.quartzlib.components.nbt.NBT;
+import fr.zcraft.quartzlib.components.nbt.NBTCompound;
+import fr.zcraft.quartzlib.tools.PluginLogger;
+import fr.zcraft.quartzlib.tools.items.ItemStackBuilder;
+import fr.zcraft.quartzlib.tools.reflection.NMSException;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 

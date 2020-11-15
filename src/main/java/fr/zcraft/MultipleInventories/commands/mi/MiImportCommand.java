@@ -3,11 +3,11 @@ package fr.zcraft.MultipleInventories.commands.mi;
 import fr.zcraft.MultipleInventories.Permissions;
 import fr.zcraft.MultipleInventories.importers.ImportProcess;
 import fr.zcraft.MultipleInventories.importers.MultiInvImporter;
-import fr.zcraft.zlib.components.commands.Command;
-import fr.zcraft.zlib.components.commands.CommandInfo;
-import fr.zcraft.zlib.components.commands.WithFlags;
-import fr.zcraft.zlib.components.i18n.I;
-import fr.zcraft.zlib.components.rawtext.RawText;
+import fr.zcraft.quartzlib.components.commands.Command;
+import fr.zcraft.quartzlib.components.commands.CommandInfo;
+import fr.zcraft.quartzlib.components.commands.WithFlags;
+import fr.zcraft.quartzlib.components.i18n.I;
+import fr.zcraft.quartzlib.components.rawtext.RawText;
 import org.bukkit.command.CommandSender;
 
 

@@ -3,9 +3,9 @@ package fr.zcraft.MultipleInventories.commands.mi;
 import fr.zcraft.MultipleInventories.Config;
 import fr.zcraft.MultipleInventories.MultipleInventories;
 import fr.zcraft.MultipleInventories.Permissions;
-import fr.zcraft.zlib.components.commands.Command;
-import fr.zcraft.zlib.components.commands.CommandInfo;
-import fr.zcraft.zlib.components.i18n.I;
+import fr.zcraft.quartzlib.components.commands.Command;
+import fr.zcraft.quartzlib.components.commands.CommandInfo;
+import fr.zcraft.quartzlib.components.i18n.I;
 import org.bukkit.command.CommandSender;
 
 
