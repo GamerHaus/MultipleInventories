@@ -1,4 +1,4 @@
-# MultipleInventories [![Build Status](https://jenkins.carrade.eu/job/MultipleInventories/job/master/badge/icon)](https://jenkins.carrade.eu/job/MultipleInventories/job/master/)
+# MultipleInventories
 
 _MultipleInventories_ is a Minecraft Bukkit plugin to separate inventories on a server per gamemode or world.
 
