@@ -33,8 +33,8 @@ package fr.zcraft.MultipleInventories.players;
 
 import fr.zcraft.MultipleInventories.Config;
 import fr.zcraft.MultipleInventories.snaphots.PlayerSnapshot;
-import fr.zcraft.quartzlib.core.QuartzComponent;
-import fr.zcraft.quartzlib.tools.runners.RunTask;
+import fr.zcraft.MultipleInventories.quartzlib.core.QuartzComponent;
+import fr.zcraft.MultipleInventories.quartzlib.tools.runners.RunTask;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.World;

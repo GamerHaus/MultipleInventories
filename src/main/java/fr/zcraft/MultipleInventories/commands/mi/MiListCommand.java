@@ -3,11 +3,11 @@ package fr.zcraft.MultipleInventories.commands.mi;
 import fr.zcraft.MultipleInventories.Config;
 import fr.zcraft.MultipleInventories.MultipleInventories;
 import fr.zcraft.MultipleInventories.Permissions;
-import fr.zcraft.quartzlib.components.commands.Command;
-import fr.zcraft.quartzlib.components.commands.CommandInfo;
-import fr.zcraft.quartzlib.components.i18n.I;
-import fr.zcraft.quartzlib.components.rawtext.RawText;
-import org.apache.commons.lang.StringUtils;
+import fr.zcraft.MultipleInventories.quartzlib.components.commands.Command;
+import fr.zcraft.MultipleInventories.quartzlib.components.commands.CommandInfo;
+import fr.zcraft.MultipleInventories.quartzlib.components.i18n.I;
+import fr.zcraft.MultipleInventories.quartzlib.components.rawtext.RawText;
+import org.apache.commons.lang3.StringUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -17,7 +17,7 @@ import java.util.Set;
 import java.util.TreeMap;
 
 
-@CommandInfo (name = "list")
+@CommandInfo(name = "list")
 public final class MiListCommand extends Command
 {
     @Override

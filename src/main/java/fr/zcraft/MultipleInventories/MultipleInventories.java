@@ -2,14 +2,13 @@ package fr.zcraft.MultipleInventories;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import fr.zcraft.MultipleInventories.commands.mi.MiImportCommand;
 import fr.zcraft.MultipleInventories.commands.mi.MiListCommand;
 import fr.zcraft.MultipleInventories.commands.mi.MiReloadCommand;
 import fr.zcraft.MultipleInventories.players.PlayersManager;
 import fr.zcraft.MultipleInventories.snaphots.SnapshotsIO;
-import fr.zcraft.quartzlib.core.QuartzPlugin;
-import fr.zcraft.quartzlib.components.commands.Commands;
-import fr.zcraft.quartzlib.components.i18n.I18n;
+import fr.zcraft.MultipleInventories.quartzlib.core.QuartzPlugin;
+import fr.zcraft.MultipleInventories.quartzlib.components.commands.Commands;
+import fr.zcraft.MultipleInventories.quartzlib.components.i18n.I18n;
 import org.bukkit.event.Listener;
 
 
@@ -35,7 +34,7 @@ public final class MultipleInventories extends QuartzPlugin implements Listener
         playersManager = loadComponent(PlayersManager.class);
 
         // noinspection unchecked
-        Commands.register("mi", MiListCommand.class, MiReloadCommand.class, MiImportCommand.class);
+        Commands.register("mi", MiListCommand.class, MiReloadCommand.class);
     }
 
     public static MultipleInventories get()

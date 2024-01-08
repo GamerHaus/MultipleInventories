@@ -37,13 +37,14 @@ import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSyntaxException;
 import fr.zcraft.MultipleInventories.MultipleInventories;
-import fr.zcraft.quartzlib.components.nbt.NBT;
-import fr.zcraft.quartzlib.components.nbt.NBTCompound;
-import fr.zcraft.quartzlib.tools.PluginLogger;
-import fr.zcraft.quartzlib.tools.items.ItemStackBuilder;
-import fr.zcraft.quartzlib.tools.reflection.NMSException;
+import fr.zcraft.MultipleInventories.quartzlib.components.nbt.NBT;
+import fr.zcraft.MultipleInventories.quartzlib.components.nbt.NBTCompound;
+import fr.zcraft.MultipleInventories.quartzlib.tools.PluginLogger;
+import fr.zcraft.MultipleInventories.quartzlib.tools.items.ItemStackBuilder;
+import fr.zcraft.MultipleInventories.quartzlib.tools.reflection.NMSException;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.Damageable;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -119,7 +120,7 @@ public class ItemStackSnapshot
         {
             return new ItemStackSnapshot(
                     stack.getType(),
-                    stack.getDurability(), stack.getAmount(),
+                    getDurabilityRemainingForItemStack(stack), stack.getAmount(),
                     NBT.fromItemStack(stack).toHashMap()
             );
         }
@@ -130,6 +131,22 @@ public class ItemStackSnapshot
         }
     }
 
+    public static void setDurabilityRemainingForItemStack(ItemStack item, short durabilityRemaining) {
+        if (item.getItemMeta() instanceof Damageable) {
+            Damageable dmg = (Damageable) item.getItemMeta();
+            dmg.setDamage(item.getType().getMaxDurability() - durabilityRemaining);
+        }
+    }
+
+    public static short getDurabilityRemainingForItemStack(ItemStack item) {
+        short durabilityRemaining = item.getType().getMaxDurability();
+        if (item.getItemMeta() instanceof Damageable) {
+            Damageable dmg = (Damageable) item.getItemMeta();
+            durabilityRemaining = (short) (item.getType().getMaxDurability() - dmg.getDamage());
+        }
+        return durabilityRemaining;
+    }
+
     /**
      * Reconstructs an ItemStack from this snapshot.
      *
@@ -137,7 +154,7 @@ public class ItemStackSnapshot
      */
     public ItemStack reconstruct()
     {
-        return new ItemStackBuilder(id).data(durability).amount(amount).nbt(nbt).replaceNBT().craftItem();
+        return new ItemStackBuilder(id).withMeta((ItemStack item) -> setDurabilityRemainingForItemStack(item, durability)).amount(amount).nbt(nbt).replaceNBT().craftItem();
     }
 
 

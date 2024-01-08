@@ -33,11 +33,11 @@ package fr.zcraft.MultipleInventories.importers;
 
 import fr.zcraft.MultipleInventories.snaphots.PlayerSnapshot;
 import fr.zcraft.MultipleInventories.snaphots.SnapshotsIO;
-import fr.zcraft.quartzlib.components.i18n.I;
-import fr.zcraft.quartzlib.core.QuartzLib;
-import fr.zcraft.quartzlib.tools.PluginLogger;
-import fr.zcraft.quartzlib.tools.runners.RunTask;
-import org.apache.commons.lang.StringUtils;
+import fr.zcraft.MultipleInventories.quartzlib.components.i18n.I;
+import fr.zcraft.MultipleInventories.quartzlib.core.QuartzLib;
+import fr.zcraft.MultipleInventories.quartzlib.tools.PluginLogger;
+import fr.zcraft.MultipleInventories.quartzlib.tools.runners.RunTask;
+import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.OfflinePlayer;

@@ -1,7 +1,7 @@
 package fr.zcraft.MultipleInventories.importers;
 
-import fr.zcraft.quartzlib.tools.PluginLogger;
-import fr.zcraft.quartzlib.tools.reflection.Reflection;
+import fr.zcraft.MultipleInventories.quartzlib.tools.PluginLogger;
+import fr.zcraft.MultipleInventories.quartzlib.tools.reflection.Reflection;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;

@@ -32,12 +32,12 @@
 package fr.zcraft.MultipleInventories.snaphots;
 
 import fr.zcraft.MultipleInventories.MultipleInventories;
-import fr.zcraft.quartzlib.components.worker.Worker;
-import fr.zcraft.quartzlib.components.worker.WorkerAttributes;
-import fr.zcraft.quartzlib.components.worker.WorkerCallback;
-import fr.zcraft.quartzlib.components.worker.WorkerRunnable;
-import fr.zcraft.quartzlib.tools.FileUtils;
-import fr.zcraft.quartzlib.tools.PluginLogger;
+import fr.zcraft.MultipleInventories.quartzlib.components.worker.Worker;
+import fr.zcraft.MultipleInventories.quartzlib.components.worker.WorkerAttributes;
+import fr.zcraft.MultipleInventories.quartzlib.components.worker.WorkerCallback;
+import fr.zcraft.MultipleInventories.quartzlib.components.worker.WorkerRunnable;
+import fr.zcraft.MultipleInventories.quartzlib.tools.FileUtils;
+import fr.zcraft.MultipleInventories.quartzlib.tools.PluginLogger;
 import org.bukkit.GameMode;
 
 import java.io.File;
