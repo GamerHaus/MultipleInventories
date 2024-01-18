@@ -313,7 +313,7 @@ public final class Reflection {
 
         try {
             method = klass.getMethod(name, types);
-        } catch (NoSuchMethodException ex) {
+        } catch (NoSuchMethodException | SecurityException ex) {
             method = klass.getDeclaredMethod(name, types);
         }
 
@@ -333,7 +333,7 @@ public final class Reflection {
         try {
             try {
                 klass.getMethod(name, parameterTypes);
-            } catch (NoSuchMethodException ex) {
+            } catch (NoSuchMethodException | SecurityException  ex) {
                 klass.getDeclaredMethod(name, parameterTypes);
             }
         } catch (NoSuchMethodException | SecurityException ex) {

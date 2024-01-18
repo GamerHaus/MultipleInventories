@@ -79,8 +79,17 @@ enum NBTType {
         try {
             //1.20
             return fromId((byte) Reflection.call(nmsNbtTag, "b"));
-        } catch (Exception ex) {
-            throw new NBTException("Unable to retrieve type of nbt tag", ex);
+        } catch (Exception e) {
+            try {
+                //1.18
+                return fromId((byte) Reflection.call(nmsNbtTag, "a"));
+            } catch (Exception e1) {
+                try {
+                    return fromId((byte) Reflection.call(nmsNbtTag, "getTypeId"));
+                } catch (Exception ex) {
+                    throw new NBTException("Unable to retrieve type of nbt tag", ex);
+                }
+            }
         }
     }
 
@@ -247,8 +256,12 @@ enum NBTType {
             switch (getNmsTagFieldName()) {
                 case "map":
                     //Since 1.17 "map" became "tags"
-                    // 1.20 modification
-                    return Reflection.call(nmsNbtTag.getClass(), nmsNbtTag, "i");
+                    try {
+                        //1.20
+                        return Reflection.call(nmsNbtTag.getClass(), nmsNbtTag, "i");
+                    } catch (Exception e) {
+                        return Reflection.call(nmsNbtTag.getClass(), nmsNbtTag, "h");
+                    }
 
                 case "list":
                     //We recreate the list because there are no getter for the list.
